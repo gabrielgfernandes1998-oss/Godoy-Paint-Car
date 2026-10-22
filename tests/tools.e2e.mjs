@@ -1,0 +1,80 @@
+import {chromium} from 'playwright';
+import {existsSync} from 'node:fs';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdtemp,readFile} from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {makeYdd,makeYtd} from './fixtures.js';
+import {openResource} from '../src/formats/resource.js';
+import {parseYtd} from '../src/formats/ytd.js';
+const output=await mkdtemp(path.join(os.tmpdir(),'godoy-tools-'));
+const port=4199;
+const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port',String(port),'--strictPort'],{stdio:['ignore','pipe','pipe']});
+let logs='',browser;
+server.stdout.on('data',d=>logs+=d);server.stderr.on('data',d=>logs+=d);
+try {
+ let ready=false;
+ for(let i=0;i<60;i++){
+  if(server.exitCode!==null)throw Error(logs);
+  try{if((await fetch(`http://127.0.0.1:${port}`)).ok){ready=true;break;}}catch{}
+  await new Promise(r=>setTimeout(r,200));
+ }
+ assert.ok(ready,'Preview não iniciou');
+ browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),headless:true,args:['--no-sandbox','--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader']});
+ const page=await browser.newPage({viewport:{width:1440,height:1050},acceptDownloads:true});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+ await page.goto(`http://127.0.0.1:${port}`);
+ await page.locator('#model-file').setInputFiles({name:'test.ydd',mimeType:'application/octet-stream',buffer:Buffer.from(makeYdd())});
+ await page.waitForFunction(()=>document.querySelector('#asset-type').textContent.includes('YDD NATIVO'));
+ // One 64x32 BGRA texture, with non-square UV view to test letterboxing.
+ const r=openResource(makeYtd(),13);
+ for(const o of [0x28,0x2a,0x38,0x3a])r.view.setUint16(o,1,true);
+ r.view.setUint16(0x250,64,true);r.view.setUint16(0x252,32,true);
+ r.view.setUint16(0x256,256,true);r.view.setUint32(0x258,21,true);
+ for(let i=r.systemSize;i<r.data.length;i+=4)r.data.set([0,0,255,255],i);
+ await page.locator('#ytd-file').setInputFiles({name:'test.ytd',mimeType:'application/octet-stream',buffer:Buffer.from(r.pack())});
+ await page.waitForFunction(()=>document.querySelector('#texture-name').textContent==='cloth_diffuse');
+ const map=()=>page.locator('#map').evaluate(c=>c.toDataURL());
+ const color=async value=>page.locator('#color').evaluate((el,v)=>{el.value=v;el.dispatchEvent(new Event('input'));},value);
+ const original=await map();
+ const box=await page.locator('#scene').boundingBox();
+ const center={x:box.x+box.width/2,y:box.y+box.height/2};
+ await page.click('[data-tool=text]');await page.fill('#text-content','GPC');await page.fill('#text-size','12');await color('#ffffff');
+ await page.mouse.click(center.x,center.y);
+ assert.notEqual(await map(),original,'Texto não aparece no 3D');
+ await page.click('#cancel-decal');assert.equal(await map(),original,'Cancelar texto deixou pixels');
+ await page.click('[data-tool=text]');await page.mouse.click(center.x,center.y);await page.click('#apply-decal');
+ const text3d=await map();assert.notEqual(text3d,original);
+ await page.click('#undo');assert.equal(await map(),original);await page.click('#redo');assert.equal(await map(),text3d);
+ // Eyedropper reads actual texture pixels, without lighting or adding history.
+ await page.click('[data-tool=eyedropper]');await color('#123456');await page.mouse.click(center.x,center.y);
+ assert.notEqual(await page.locator('#color').inputValue(),'#123456','Conta-gotas 3D falhou');assert.equal(await map(),text3d);
+ await page.click('#tab-uv');
+ const uvPoint=async(x,y)=>page.locator('#uv-view').evaluate((c,[u,v])=>{const r=c.getBoundingClientRect();const scale=Math.min(r.width/c.width,r.height/c.height);const w=c.width*scale,h=c.height*scale;return{x:r.left+(r.width-w)/2+u*w,y:r.top+(r.height-h)/2+v*h};},[x,y]);
+ await page.click('[data-tool=text]');await page.fill('#text-content','UV');await color('#ffffff');
+ const pos=await uvPoint(.3,.3);await page.mouse.click(pos.x,pos.y);await page.click('#apply-decal');
+ const text2d=await map();assert.notEqual(text2d,text3d,'Texto no mapa falhou');
+ await page.click('[data-tool=line]');await color('#00ff00');
+ await page.locator('#size').evaluate(el=>{el.value=2;el.dispatchEvent(new Event('input'));});
+ const a=await uvPoint(.2,.75),b=await uvPoint(.8,.75);
+ await page.mouse.move(a.x,a.y);await page.mouse.down();await page.mouse.move(b.x,b.y,{steps:5});
+ assert.notEqual(await map(),text2d,'Prévia da linha ausente');
+ await page.keyboard.press('Escape');await page.mouse.up();assert.equal(await map(),text2d,'Escape não cancelou a linha');
+ await page.click('[data-tool=line]');await page.mouse.move(a.x,a.y);await page.mouse.down();await page.mouse.move(b.x,b.y,{steps:5});await page.mouse.up();
+ const lined=await map();assert.notEqual(lined,text2d,'Linha não aplicada');
+ await page.click('[data-tool=eyedropper]');await color('#000000');const mid=await uvPoint(.5,.75);await page.mouse.click(mid.x,mid.y);
+ assert.equal(await page.locator('#color').inputValue(),'#00ff00','Conta-gotas do mapa não leu a cor exata');assert.equal(await map(),lined);
+ await page.click('#undo');assert.equal(await map(),text2d,'Conta-gotas adicionou etapa de histórico');await page.click('#redo');assert.equal(await map(),lined);
+ await page.click('#tab-3d');await page.click('[data-tool=line]');await color('#0000ff');
+ await page.mouse.move(center.x-10,center.y);await page.mouse.down();await page.mouse.move(center.x+10,center.y,{steps:4});await page.mouse.up();
+ const finalMap=await map();assert.notEqual(finalMap,lined,'Linha no 3D falhou');
+ const saving=page.waitForEvent('download');await page.click('#save-project');const project=path.join(output,'tools.paintfive');await(await saving).saveAs(project);
+ await page.locator('#model-file').setInputFiles(project);await page.waitForFunction(()=>document.querySelector('#toast').textContent==='Projeto restaurado.');assert.equal(await map(),finalMap,'Projeto perdeu as ferramentas aplicadas');
+ const exporting=page.waitForEvent('download');await page.click('#export-native');const ytd=path.join(output,'tools.ytd');await(await exporting).saveAs(ytd);
+ const pixels=parseYtd(await readFile(ytd)).textures[0].decode();
+ assert.ok(pixels.some((v,i)=>i%4===1&&v===255),'Exportação perdeu a linha verde');
+ assert.ok(pixels.some((v,i)=>i%4===2&&v===255),'Exportação perdeu linha azul/texto branco');
+ await page.screenshot({path:path.join(output,'tools.png')});assert.deepEqual(errors,[]);
+ console.log('PASS: texto 3D/UV, prévia/cancelar/aplicar, linha 3D/UV, Escape, conta-gotas sem histórico, desfazer/refazer, projeto restaurado e exportação YTD.');console.log('Artifacts:',output);
+} finally {await browser?.close();server.kill();}

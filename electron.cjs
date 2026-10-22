@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, dialog } = require("electron");
 const path = require("node:path");
 let mainWindow;
 app.setName("Godoy Paint Car");
@@ -19,6 +19,21 @@ app.whenReady().then(() => {
   });
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   mainWindow.webContents.on("will-navigate", (event) => event.preventDefault());
+  // Electron cancels beforeunload silently unless the main process handles it.
+  mainWindow.webContents.on("will-prevent-unload", (event) => {
+    const choice = dialog.showMessageBoxSync(mainWindow, {
+      type: "question",
+      title: "Fechar Godoy Paint Car?",
+      message: "Existem alterações não salvas.",
+      detail: "Salve seu projeto antes de sair para continuar a edição depois.",
+      buttons: ["Continuar editando", "Sair sem salvar"],
+      defaultId: 0,
+      cancelId: 0,
+      noLink: true,
+    });
+    // For will-prevent-unload, preventDefault ALLOWS closing the window.
+    if (choice === 1) event.preventDefault();
+  });
   mainWindow.loadFile(path.join(__dirname, "dist", "index.html"));
 });
 app.on("window-all-closed", () => app.quit());

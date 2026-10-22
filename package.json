@@ -1,6 +1,6 @@
 {
   "name": "godoy-paint-car",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,8 +9,9 @@
     "preview": "vite preview --host 0.0.0.0",
     "package:windows": "npm run build && node scripts/portable.mjs",
     "test": "node --test tests/native-formats.test.js",
-    "test:browser": "node tests/editor.e2e.mjs",
-    "test:assets": "node scripts/validate-native-assets.mjs"
+    "test:browser": "node tests/editor.e2e.mjs && node tests/tools.e2e.mjs",
+    "test:assets": "node scripts/validate-native-assets.mjs",
+    "test:electron": "node tests/electron-close.e2e.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.3",

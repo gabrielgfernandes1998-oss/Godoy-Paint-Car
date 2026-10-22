@@ -21,6 +21,9 @@ import {
   MousePointer2,
   Paintbrush,
   Eraser,
+  Type,
+  Pipette,
+  Minus,
   Image as ImageIcon,
   Undo2,
   Redo2,
@@ -46,6 +49,9 @@ const icons = {
   MousePointer2,
   Paintbrush,
   Eraser,
+  Type,
+  Pipette,
+  Minus,
   Image: ImageIcon,
   Undo2,
   Redo2,
@@ -60,8 +66,8 @@ const icon = (name) => `<i data-lucide="${name}"></i>`;
 document.querySelector("#app").innerHTML = `
 <header><div class="brand"><div class="brand-mark">P</div>GODOY<em>PAINT CAR</em></div><div class="header-divider"></div><div class="project-title">Pintura de viatura <small>Vehicle Studio / Projeto local</small></div><div class="header-actions"><button id="save-project">${icon("save")}<span>Salvar projeto</span></button><button id="export" class="accent">${icon("download")}<span>Exportar textura</span></button><div class="avatar">PF</div></div></header>
 <div class="workspace"><aside class="left"><div class="panel-head"><span class="eyebrow">EXPLORADOR</span><span class="count">01</span></div><div class="asset"><div class="asset-icon">${icon("car")}</div><div><strong id="asset-name">Viatura demonstrativa</strong><small id="asset-type">MODELO DE DEMONSTRAÇÃO</small></div><div class="dot"></div></div><div class="section"><button class="upload" id="import-model">${icon("folder-open")} Importar modelo</button><p class="file-note">YFT / YDD / GLB / GLTF · Projeto .paintfive<br>YFT / YTD nativos · GTA V Legacy / FiveM</p></div><div id="native-model-controls" class="section hidden"><label class="section-title" for="drawable-select">MODELO / FRAGMENTO</label><select id="drawable-select" class="full"></select><label class="section-title" for="lod-select" style="margin-top:14px">NÍVEL DE DETALHE</label><select id="lod-select" class="full"></select></div><div class="panel-head"><span class="eyebrow">TEXTURA</span><span class="count">01</span></div><div class="section" style="padding-top:0"><div class="layer active"><div class="layer-preview"></div><span><span id="texture-name">Diffuse texture</span><small id="texture-dimensions">Canvas editável · 2048 × 2048</small></span>${icon("eye")}</div><button class="upload" id="import-ytd">${icon("folder-open")} Abrir dicionário YTD</button><div id="native-texture-controls" class="hidden"><label class="section-title" for="texture-select" style="margin-top:15px">TEXTURAS DO DICIONÁRIO</label><select id="texture-select" class="full"></select><p id="native-texture-info" class="help"></p><label class="section-title" for="material-select">APLICAR NA VIATURA</label><select id="material-select" class="full"><option value="all">Todas as superfícies</option></select><button id="bind-texture" class="full" style="margin-top:8px">Vincular textura selecionada</button><button id="export-native" class="accent full" style="margin-top:10px">Exportar YTD editado</button><p class="file-note">Salva uma cópia. O arquivo original é preservado.</p></div><button class="upload" id="import-texture" style="margin-top:10px">${icon("image-plus")} Abrir textura PNG / JPG</button></div><div class="panel-head"><span class="eyebrow">BIBLIOTECA</span>${icon("images")}</div><div class="section" style="padding-top:0"><button class="upload" id="import-image">${icon("plus")} Adicionar imagem</button><p class="file-note">Aplique uma arte na viatura e ajuste sua posição diretamente no modelo.</p></div><div class="info-card"><strong>${icon("sparkles")} Sua ideia. Na superfície.</strong><p>Pinte no 3D e acompanhe cada alteração no mapa de textura, em tempo real.</p></div></aside>
-<main class="center"><div class="viewbar"><div class="tabs"><button id="tab-3d" class="active">${icon("box")} Editor 3D</button><button id="tab-uv">${icon("scan")} Mapa UV</button></div><div class="view-meta"><span class="green-dot"></span>Renderização em tempo real</div></div><div class="viewport"><canvas id="scene"></canvas><canvas id="uv-view" width="2048" height="2048"></canvas><div class="viewport-label"><strong id="view-name">PERSPECTIVA</strong><p>MATERIAL PREVIEW · STUDIO LIGHT</p></div><div class="tools"><button data-tool="orbit" title="Orbitar (V)">${icon("mouse-pointer-2")}</button><div class="tool-divider"></div><button data-tool="brush" class="active" title="Pincel (B)">${icon("paintbrush")}</button><button data-tool="erase" title="Restaurar textura base (E)">${icon("eraser")}</button><button data-tool="decal" title="Aplicar imagem (D)">${icon("image")}</button><div class="tool-divider"></div><button id="undo" title="Desfazer (Ctrl+Z)">${icon("undo-2")}</button><button id="redo" title="Refazer (Ctrl+Shift+Z)">${icon("redo-2")}</button></div><div class="view-hint"><kbd>Arraste</kbd> pintar &nbsp;·&nbsp; <kbd>Botão direito</kbd> orbitar &nbsp;·&nbsp; <kbd>Scroll</kbd> zoom</div><div class="axis"><b>Y</b><i>X</i><span>Z</span></div></div><div class="view-bottom"><span>${icon("car")}<span id="mesh-info">Importe o YFT da sua viatura</span></span><button id="reset-view">${icon("focus")} Centralizar</button><span class="badge">● TEXTURA CONECTADA</span></div></main>
-<aside class="right"><div class="panel-head"><span class="prop-title">${icon("sliders-horizontal")} Propriedades</span>${icon("ellipsis")}</div><div class="section"><div class="section-title">FERRAMENTA ATIVA <span class="mini-tag" id="tool-tag">PINCEL</span></div><div class="brush-only"><div class="label-row"><label for="size">Tamanho do pincel</label><output class="value" id="size-out">32 px</output></div><input id="size" type="range" min="2" max="180" value="32"><div class="label-row"><label for="opacity">Opacidade</label><output class="value" id="opacity-out">100%</output></div><input id="opacity" type="range" min="1" max="100" value="100"><div class="label-row"><label for="softness">Suavidade</label><output class="value" id="softness-out">25%</output></div><input id="softness" type="range" min="0" max="95" value="25"></div><div class="decal-controls"><p class="help">Clique e arraste sobre a viatura para posicionar a imagem. Ajuste antes de aplicar.</p><div class="label-row"><label for="scale">Escala</label><output class="value" id="scale-out">30%</output></div><input id="scale" type="range" min="3" max="100" value="30"><div class="label-row"><label for="rotation">Rotação</label><output class="value" id="rotation-out">0°</output></div><input id="rotation" type="range" min="-180" max="180" value="0"><button id="apply-decal" class="accent full">${icon("check")} Aplicar imagem</button><button id="cancel-decal" class="full" style="margin-top:8px">Cancelar posicionamento</button></div></div><div class="section brush-only"><div class="section-title">COR DO PINCEL</div><div class="colors">${["#c7fa68", "#e9e4d8", "#17191d", "#ef695e", "#86a7ee", "#c19de5"].map((c) => `<button class="swatch" data-color="${c}" style="background:${c}" aria-label="Cor ${c}"></button>`).join("")}</div><div class="color-entry"><input id="color" type="color" value="#c7fa68" aria-label="Cor personalizada"><span id="color-hex">#C7FA68</span></div></div><div class="section"><div class="section-title">MAPA DE TEXTURA <span style="margin-left:auto">${icon("maximize-2")}</span></div><canvas class="map" id="map" width="320" height="320"></canvas><div class="map-footer"><span>DIFFUSE / BASE COLOR</span><span id="map-size">2048²</span></div><p class="help">Abra o YFT da viatura e seu YTD. Selecione a textura para pintar e exporte uma cópia do dicionário editado ou o PNG.</p></div><div class="section"><div class="section-title">VISUALIZAÇÃO</div><button id="back-view" class="full">${icon("rotate-3d")} Alternar frente / verso</button><div class="label-row" style="margin-top:18px"><label for="wireframe">Exibir malha</label><input id="wireframe" type="checkbox"></div></div></aside></div><footer class="footer"><span><span class="green-dot"></span><b id="status">Pronto para criar</b></span><span>GODOY PAINT CAR <span> / </span> LOCAL WORKSPACE <span> / </span> v0.2</span></footer><div id="toast" role="status"></div><input type="file" id="model-file" accept=".glb,.gltf,.paintfive,.yft,.ydd,.ytd" hidden><input type="file" id="ytd-file" accept=".ytd" hidden><input type="file" id="texture-file" accept="image/png,image/jpeg,image/webp" hidden><input type="file" id="image-file" accept="image/png,image/jpeg,image/webp" hidden>`;
+<main class="center"><div class="viewbar"><div class="tabs"><button id="tab-3d" class="active">${icon("box")} Editor 3D</button><button id="tab-uv">${icon("scan")} Mapa UV</button></div><div class="view-meta"><span class="green-dot"></span>Renderização em tempo real</div></div><div class="viewport"><canvas id="scene"></canvas><canvas id="uv-view" width="2048" height="2048"></canvas><div class="viewport-label"><strong id="view-name">PERSPECTIVA</strong><p>MATERIAL PREVIEW · STUDIO LIGHT</p></div><div class="tools"><button data-tool="orbit" title="Orbitar (V)">${icon("mouse-pointer-2")}</button><div class="tool-divider"></div><button data-tool="brush" class="active" title="Pincel (B)">${icon("paintbrush")}</button><button data-tool="erase" title="Restaurar textura base (E)">${icon("eraser")}</button><button data-tool="text" title="Texto (T)">${icon("type")}</button><button data-tool="line" title="Linha (L)">${icon("minus")}</button><button data-tool="eyedropper" title="Conta-gotas (I)">${icon("pipette")}</button><button data-tool="decal" title="Aplicar imagem (D)">${icon("image")}</button><div class="tool-divider"></div><button id="undo" title="Desfazer (Ctrl+Z)">${icon("undo-2")}</button><button id="redo" title="Refazer (Ctrl+Shift+Z)">${icon("redo-2")}</button></div><div class="view-hint"><kbd>Arraste</kbd> pintar &nbsp;·&nbsp; <kbd>Botão direito</kbd> orbitar &nbsp;·&nbsp; <kbd>Scroll</kbd> zoom</div><div class="axis"><b>Y</b><i>X</i><span>Z</span></div></div><div class="view-bottom"><span>${icon("car")}<span id="mesh-info">Importe o YFT da sua viatura</span></span><button id="reset-view">${icon("focus")} Centralizar</button><span class="badge">● TEXTURA CONECTADA</span></div></main>
+<aside class="right"><div class="panel-head"><span class="prop-title">${icon("sliders-horizontal")} Propriedades</span>${icon("ellipsis")}</div><div class="section"><div class="section-title">FERRAMENTA ATIVA <span class="mini-tag" id="tool-tag">PINCEL</span></div><div class="brush-only"><div class="label-row"><label for="size">Tamanho do pincel</label><output class="value" id="size-out">32 px</output></div><input id="size" type="range" min="2" max="180" value="32"><div class="label-row"><label for="opacity">Opacidade</label><output class="value" id="opacity-out">100%</output></div><input id="opacity" type="range" min="1" max="100" value="100"><div class="label-row"><label for="softness">Suavidade</label><output class="value" id="softness-out">25%</output></div><input id="softness" type="range" min="0" max="95" value="25"></div><div class="text-controls"><label class="section-title" for="text-content">TEXTO</label><textarea id="text-content" maxlength="500" rows="3" placeholder="Digite o texto da viatura">POLÍCIA</textarea><label class="section-title" for="text-font">FONTE</label><select id="text-font" class="full"><option value="Arial">Arial</option><option value="Arial Black">Arial Black</option><option value="Georgia">Georgia</option><option value="monospace">Monoespaçada</option></select><div class="label-row"><label for="text-size">Tamanho na textura (px)</label><input id="text-size" type="number" min="12" max="512" value="96"></div><div class="label-row"><label for="text-bold">Negrito</label><input id="text-bold" type="checkbox" checked></div><div class="label-row"><label for="text-opacity">Opacidade (%)</label><input id="text-opacity" type="number" min="1" max="100" value="100"></div></div><div class="decal-controls"><p class="help">Clique e arraste no 3D ou no mapa para posicionar. Ajuste antes de aplicar.</p><div class="image-scale"><div class="label-row"><label for="scale">Escala</label><output class="value" id="scale-out">30%</output></div><input id="scale" type="range" min="3" max="100" value="30"></div><div class="label-row"><label for="rotation">Rotação</label><output class="value" id="rotation-out">0°</output></div><input id="rotation" type="range" min="-180" max="180" value="0"><button id="apply-decal" class="accent full">${icon("check")} Aplicar imagem</button><button id="cancel-decal" class="full" style="margin-top:8px">Cancelar posicionamento</button></div></div><div class="section brush-only color-section"><div class="section-title">COR</div><div class="colors">${["#c7fa68", "#e9e4d8", "#17191d", "#ef695e", "#86a7ee", "#c19de5"].map((c) => `<button class="swatch" data-color="${c}" style="background:${c}" aria-label="Cor ${c}"></button>`).join("")}</div><div class="color-entry"><input id="color" type="color" value="#c7fa68" aria-label="Cor personalizada"><span id="color-hex">#C7FA68</span></div></div><div class="section"><div class="section-title">MAPA DE TEXTURA <span style="margin-left:auto">${icon("maximize-2")}</span></div><canvas class="map" id="map" width="320" height="320"></canvas><div class="map-footer"><span>DIFFUSE / BASE COLOR</span><span id="map-size">2048²</span></div><p class="help">Abra o YFT da viatura e seu YTD. Selecione a textura para pintar e exporte uma cópia do dicionário editado ou o PNG.</p></div><div class="section"><div class="section-title">VISUALIZAÇÃO</div><button id="back-view" class="full">${icon("rotate-3d")} Alternar frente / verso</button><div class="label-row" style="margin-top:18px"><label for="wireframe">Exibir malha</label><input id="wireframe" type="checkbox"></div></div></aside></div><footer class="footer"><span><span class="green-dot"></span><b id="status">Pronto para criar</b></span><span>GODOY PAINT CAR <span> / </span> LOCAL WORKSPACE <span> / </span> v0.3.0</span></footer><div id="toast" role="status"></div><input type="file" id="model-file" accept=".glb,.gltf,.paintfive,.yft,.ydd,.ytd" hidden><input type="file" id="ytd-file" accept=".ytd" hidden><input type="file" id="texture-file" accept="image/png,image/jpeg,image/webp" hidden><input type="file" id="image-file" accept="image/png,image/jpeg,image/webp" hidden>`;
 createIcons({ icons });
 const $ = (s) => document.querySelector(s);
 let toastTimer;
@@ -188,6 +194,7 @@ let tool = "brush",
   changed = false,
   showUV = false,
   backView = false;
+let lineStart = null, lineSnapshot = null;
 let decal = null,
   decalUV = null,
   decalSnapshot = null;
@@ -229,17 +236,22 @@ refresh();
 updateHistory();
 $("#status").textContent = "Pronto para criar";
 function setTool(next) {
-  if (decalSnapshot && next !== "decal") cancelDecal();
+  if (next !== tool) { cancelDecal(); endStroke(); }
   tool = next;
   document
     .querySelectorAll("[data-tool]")
     .forEach((b) => b.classList.toggle("active", b.dataset.tool === tool));
-  $(".right").classList.toggle("decal-mode", tool === "decal");
+  $(".right").classList.toggle("decal-mode", isStamp());
+  $(".right").classList.toggle("text-mode", tool === "text");
+  $("#apply-decal").textContent = tool === "text" ? "Aplicar texto" : "Aplicar imagem";
   $("#tool-tag").textContent = {
     brush: "PINCEL",
     erase: "RESTAURAR",
     orbit: "NAVEGAR",
     decal: "IMAGEM",
+    text: "TEXTO",
+    line: "LINHA",
+    eyedropper: "CONTA-GOTAS",
   }[tool];
   controls.mouseButtons.LEFT = tool === "orbit" ? THREE.MOUSE.ROTATE : null;
   $("#scene").style.cursor = tool === "orbit" ? "grab" : "crosshair";
@@ -257,11 +269,75 @@ for (const id of ["size", "opacity", "softness", "scale", "rotation"]) {
   $("#" + id).oninput = (e) => {
     $("#" + id + "-out").textContent =
       e.target.value + ({ size: " px", rotation: "°" }[id] || "%");
-    if (tool === "decal" && decalUV) previewDecal();
+    if (isStamp() && decalUV) previewDecal();
   };
 }
-$("#color").oninput = (e) =>
-  ($("#color-hex").textContent = e.target.value.toUpperCase());
+$("#color").oninput = (e) => {
+  $("#color-hex").textContent = e.target.value.toUpperCase();
+  if (tool === "text" && decalUV) previewDecal();
+};
+for (const id of ["text-content", "text-font", "text-size", "text-bold", "text-opacity"]) {
+  $("#" + id).addEventListener("input", () => { if (tool === "text" && decalUV) previewDecal(); });
+}
+function isStamp() { return tool === "decal" || tool === "text"; }
+function textStamp() {
+  const lines = $("#text-content").value.slice(0, 500).split("\n");
+  if (!lines.some(line => line.trim())) return null;
+  const fontSize = Math.max(12, Math.min(512, Number($("#text-size").value) || 96));
+  const font = `${$("#text-bold").checked ? "bold " : ""}${fontSize}px "${$("#text-font").value}"`;
+  const canvas = document.createElement("canvas"), c = canvas.getContext("2d");
+  c.font = font;
+  const padding = Math.ceil(fontSize * 0.25);
+  canvas.width = Math.min(8192, Math.max(1, Math.ceil(Math.max(...lines.map(line => c.measureText(line).width))) + padding * 2));
+  canvas.height = Math.min(2048, Math.ceil(lines.length * fontSize * 1.25 + padding * 2));
+  c.font = font;
+  c.textBaseline = "top";
+  c.fillStyle = $("#color").value;
+  lines.forEach((line, i) => c.fillText(line, padding, padding + i * fontSize * 1.25));
+  return canvas;
+}
+function uvHit(event) {
+  const r = $("#uv-view").getBoundingClientRect();
+  const scale = Math.min(r.width / size, r.height / textureHeight);
+  const w = size * scale, h = textureHeight * scale;
+  const x = event.clientX - r.left - (r.width - w) / 2;
+  const y = event.clientY - r.top - (r.height - h) / 2;
+  return x >= 0 && y >= 0 && x <= w && y <= h ? new THREE.Vector2(x / w, 1 - y / h) : null;
+}
+function sampleColor(uv) {
+  const x = Math.max(0, Math.min(size - 1, Math.floor(uv.x * size)));
+  const y = Math.max(0, Math.min(textureHeight - 1, Math.floor((1 - uv.y) * textureHeight)));
+  const rgb = ctx.getImageData(x, y, 1, 1).data;
+  const color = "#" + [...rgb].slice(0, 3).map(v => v.toString(16).padStart(2, "0")).join("");
+  $("#color").value = color;
+  $("#color").dispatchEvent(new Event("input"));
+  toast(`Cor capturada: ${color.toUpperCase()}`);
+}
+function previewLine(uv) {
+  if (!lineSnapshot || !lineStart) return;
+  ctx.putImageData(lineSnapshot, 0, 0);
+  ctx.save();
+  ctx.globalAlpha = Number($("#opacity").value) / 100;
+  ctx.strokeStyle = $("#color").value;
+  ctx.lineWidth = Number($("#size").value);
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(lineStart.x * size, (1 - lineStart.y) * textureHeight);
+  ctx.lineTo(uv.x * size, (1 - uv.y) * textureHeight);
+  ctx.stroke();
+  ctx.restore();
+  refresh();
+}
+function cancelLine() {
+  if (lineSnapshot) {
+    ctx.putImageData(lineSnapshot, 0, 0);
+    lineSnapshot = lineStart = null;
+    painting = false;
+    controls.enabled = true;
+    refresh();
+  }
+}
+
 document.querySelectorAll("[data-color]").forEach(
   (b) =>
     (b.onclick = () => {
@@ -333,61 +409,79 @@ function paint(uv) {
   lastUV = uv.clone();
   refresh();
 }
-$("#scene").addEventListener("pointerdown", (e) => {
-  if (e.button !== 0 || showUV || tool === "orbit") return;
-  const uv = hit(e);
-  if (!uv) return;
-  painting = true;
-  $("#scene").setPointerCapture(e.pointerId);
-  controls.enabled = false;
-  if (tool === "decal") {
-    if (!decal) {
-      painting = false;
-      controls.enabled = true;
+for (const surface of [$("#scene"), $("#uv-view")]) {
+  const coordinates = event => surface.id === "uv-view" ? uvHit(event) : hit(event);
+  surface.addEventListener("pointerdown", e => {
+    if (e.button !== 0 || tool === "orbit") return;
+    const uv = coordinates(e);
+    if (!uv) return;
+    if (tool === "eyedropper") { sampleColor(uv); return; }
+    if (isStamp() && !(tool === "text" ? textStamp() : decal)) {
+      toast(tool === "text" ? "Digite um texto antes de posicionar." : "Adicione uma imagem primeiro.");
       return;
     }
-    if (!decalSnapshot) decalSnapshot = snapshot();
-    decalUV = uv.clone();
-    previewDecal();
-  } else {
-    pushHistory();
-    paint(uv);
-    changed = true;
-  }
-});
-$("#scene").addEventListener("pointermove", (e) => {
-  if (!painting) return;
-  const uv = hit(e);
-  if (!uv) {
-    lastUV = null;
-    return;
-  }
-  if (tool === "decal") {
-    decalUV = uv.clone();
-    previewDecal();
-  } else paint(uv);
-});
+    e.preventDefault();
+    painting = true;
+    surface.setPointerCapture(e.pointerId);
+    controls.enabled = false;
+    if (isStamp()) {
+      if (!decalSnapshot) decalSnapshot = snapshot();
+      decalUV = uv.clone();
+      previewDecal();
+    } else if (tool === "line") {
+      lineStart = uv.clone();
+      lineSnapshot = snapshot();
+      previewLine(uv);
+    } else {
+      pushHistory();
+      paint(uv);
+      changed = true;
+    }
+  });
+  surface.addEventListener("pointermove", e => {
+    if (!painting) return;
+    const uv = coordinates(e);
+    if (!uv) { lastUV = null; return; }
+    if (isStamp()) { decalUV = uv.clone(); previewDecal(); }
+    else if (tool === "line") previewLine(uv);
+    else paint(uv);
+  });
+  surface.addEventListener("pointercancel", () => { cancelLine(); endStroke(); });
+  surface.addEventListener("lostpointercapture", endStroke);
+  surface.addEventListener("contextmenu", e => e.preventDefault());
+}
 function endStroke() {
+  if (lineSnapshot) {
+    history.push(lineSnapshot);
+    if (history.length > 12) history.shift();
+    future.length = 0;
+    lineSnapshot = lineStart = null;
+    markTextureDirty();
+    changed = true;
+    updateHistory();
+  }
   painting = false;
   lastUV = null;
   controls.enabled = true;
 }
 window.addEventListener("pointerup", endStroke);
-$("#scene").addEventListener("lostpointercapture", endStroke);
-$("#scene").addEventListener("contextmenu", (e) => e.preventDefault());
 function previewDecal() {
   if (!decalSnapshot || !decalUV) return;
   ctx.putImageData(decalSnapshot, 0, 0);
-  const width = (size * Number($("#scale").value)) / 100;
-  const height = (width * decal.height) / decal.width;
+  const stamp = tool === "text" ? textStamp() : decal;
+  if (!stamp) { refresh(); return; }
+  const width = tool === "text" ? stamp.width : (size * Number($("#scale").value)) / 100;
+  const height = (width * stamp.height) / stamp.width;
   ctx.save();
   ctx.translate(decalUV.x * size, (1 - decalUV.y) * textureHeight);
   ctx.rotate((Number($("#rotation").value) * Math.PI) / 180);
-  ctx.drawImage(decal, -width / 2, -height / 2, width, height);
+  ctx.globalAlpha = tool === "text" ? Math.max(0.01, Math.min(1, Number($("#text-opacity").value) / 100 || 1)) : 1;
+  ctx.drawImage(stamp, -width / 2, -height / 2, width, height);
   ctx.restore();
   refresh();
 }
 function cancelDecal() {
+  cancelLine();
   if (decalSnapshot) {
     ctx.putImageData(decalSnapshot, 0, 0);
     decalSnapshot = null;
@@ -401,7 +495,7 @@ $("#cancel-decal").onclick = () => {
 };
 $("#apply-decal").onclick = () => {
   if (!decalSnapshot)
-    return toast("Clique na viatura para posicionar a imagem primeiro.");
+    return toast("Clique no 3D ou na textura para posicionar primeiro.");
   markTextureDirty();
   history.push(decalSnapshot);
   if (history.length > 12) history.shift();
@@ -410,8 +504,9 @@ $("#apply-decal").onclick = () => {
   decalUV = null;
   changed = true;
   updateHistory();
+  const applied = tool === "text" ? "Texto aplicado" : "Imagem aplicada";
   setTool("brush");
-  toast("Imagem aplicada ao mapa de textura.");
+  toast(`${applied} ao mapa de textura.`);
 };
 $("#undo").onclick = () => {
   cancelDecal();
@@ -437,11 +532,11 @@ function view(uv) {
   showUV = uv;
   $("#uv-view").style.display = uv ? "block" : "none";
   $("#scene").style.visibility = uv ? "hidden" : "visible";
-  $(".tools").style.display = uv ? "none" : "flex";
+  $(".tools").style.display = "flex";
   $(".view-hint").style.display = uv ? "none" : "block";
   $("#tab-uv").classList.toggle("active", uv);
   $("#tab-3d").classList.toggle("active", !uv);
-  $("#view-name").textContent = uv ? "MAPA UV · 2048 × 2048" : "PERSPECTIVA";
+  $("#view-name").textContent = uv ? `MAPA UV · ${size} × ${textureHeight}` : "PERSPECTIVA";
 }
 $("#tab-3d").onclick = () => view(false);
 $("#tab-uv").onclick = () => view(true);
@@ -472,7 +567,7 @@ const download = (name, blob) => {
 };
 $("#export").onclick = () => {
   if (decalSnapshot)
-    return toast("Aplique ou cancele a imagem antes de exportar.");
+    return toast("Aplique ou cancele o texto/imagem antes de exportar.");
   textureCanvas.toBlob(
     (blob) =>
       download(
@@ -984,7 +1079,7 @@ function mipPixels(canvas, entry) {
 }
 $("#export-native").onclick = async () => {
   if (!nativeTextures || decalSnapshot)
-    return toast("Aplique ou cancele a imagem antes de exportar.");
+    return toast("Aplique ou cancele o texto/imagem antes de exportar.");
   const button = $("#export-native");
   button.disabled = true;
   button.textContent = "Preparando arquivo…";
@@ -1047,7 +1142,7 @@ $("#export-native").onclick = async () => {
 };
 $("#save-project").onclick = () => {
   if (decalSnapshot)
-    return toast("Aplique ou cancele a imagem antes de salvar.");
+    return toast("Aplique ou cancele o texto/imagem antes de salvar.");
   flushTexture();
   const project = {
     format: "paintfive",
@@ -1305,13 +1400,13 @@ window.addEventListener("keydown", (e) => {
     cancelDecal();
     setTool("orbit");
   }
-  const keyTool = { b: "brush", e: "erase", v: "orbit", d: "decal" }[
+  const keyTool = { b: "brush", e: "erase", v: "orbit", d: "decal", t: "text", l: "line", i: "eyedropper" }[
     e.key.toLowerCase()
   ];
   if (keyTool) setTool(keyTool);
 });
 window.addEventListener("beforeunload", (e) => {
-  if (changed || decalSnapshot) {
+  if (changed || decalSnapshot || lineSnapshot) {
     e.preventDefault();
     e.returnValue = "";
   }

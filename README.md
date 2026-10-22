@@ -16,6 +16,19 @@ Baixe o ZIP em [Releases](https://github.com/gabrielgfernandes1998-oss/Godoy-Pai
 
 Os arquivos originais não são sobrescritos. Para pintura externa no YTD, os YFT originais continuam em uso no FiveM; não é necessário exportar geometria.
 
+## Texto, linha e conta-gotas
+
+As ferramentas também funcionam no **Mapa UV**, sobre a textura plana:
+
+- **Texto (T):** digite o conteúdo, escolha fonte, tamanho em pixels, negrito, cor e opacidade. Clique/arraste no 3D ou na textura para posicionar; ajuste a rotação e clique em **Aplicar texto**. **Cancelar** ou **Escape** removem a prévia. O texto aplicado vira pixels e pode ser desfeito; não é uma camada vetorial editável.
+- **Linha (L):** escolha cor, espessura e opacidade, arraste entre os dois pontos e solte para aplicar. **Escape** durante o arraste cancela a linha.
+- **Conta-gotas (I):** clique no modelo ou no mapa para copiar a cor do pixel da textura selecionada, sem a iluminação do 3D. Não altera pixels nem adiciona histórico.
+- **Ctrl+Z / Ctrl+Shift+Z:** desfazer/refazer texto, linhas e pintura. As ferramentas aplicadas são preservadas em projetos e na exportação YTD/PNG.
+
+Linhas são retas no mapa UV; textos e imagens também seguem o UV do modelo. Costuras e ilhas UV podem separar ou distorcer a arte no 3D. Use o mapa plano para controlar a posição na textura.
+
+O botão **X** da janela fecha diretamente um projeto sem alterações. Com alterações ou uma prévia pendente, mostra **Continuar editando** e **Sair sem salvar**; salvar o projeto preserva a edição para depois.
+
 ## Compatibilidade e limites
 
 - YFT RSC7 versão 162 (Legacy): drawable principal e array de drawables, malhas indexadas e seleção de LODs presentes. `DiffuseSampler2` identifica a pintura; usa UV1 quando disponível, senão UV0.
@@ -38,6 +51,8 @@ npm run dev -- --port 5173
 npm test
 npm run build
 CHROMIUM_PATH=/usr/bin/chromium npm run test:browser
+# Teste de fechamento em Electron Linux (executável oficial já instalado):
+ELECTRON_PATH=/caminho/electron npm run test:electron
 ```
 
 Sem banco de dados, credenciais ou serviços externos obrigatórios. As fontes externas são opcionais.
@@ -57,7 +72,8 @@ A implementação e os codecs JavaScript vêm da base PAINTFIVE do mesmo proprie
 ## Validação desta implementação
 
 - 10 testes unitários de formatos e codecs.
-- Build de produção e testes funcionais de navegador da base PAINTFIVE.
+- Build de produção, testes funcionais da base e testes de texto/linha/conta-gotas em 3D e UV, histórico, projeto e exportação YTD.
+- Fechamento testado com Electron real em Linux: janela limpa, cancelamento e saída com alterações. O teste simula a escolha dos botões da caixa nativa.
 - Hilux fornecida: leitura de `vrhiluxsp.yft` e `vrhiluxsp_hi.yft`, cada um com 112 malhas, 339.019 vértices e 346.707 triângulos; decodificação das 73 texturas do YTD e preservação dos bytes descomprimidos ao exportar sem edições.
 - Teste de navegador com `vrhiluxsp.yft` e seu YTD: pintura no 3D, exportação/releitura com somente a textura editada alterada, preservação das outras 72 texturas, salvamento/reabertura do projeto YFT e troca de variação da pintura.
 - Testes funcionais executados em Chromium/Linux. A execução no jogo e do portable em Windows requer validação nessas plataformas.
