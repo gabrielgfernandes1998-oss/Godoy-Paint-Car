@@ -19,8 +19,8 @@ Cada textura possui seu próprio documento e histórico:
 
 - **+ Pintura** cria uma camada transparente de pixels. Pincel **B** e borracha **E** atuam na camada de pintura ativa. Se um objeto ou a base estiver selecionado, o pincel cria uma camada de pixels. A borracha remove pixels da camada, revelando as camadas abaixo.
 - Selecione a camada na lista para mudar nome, visibilidade, ordem, opacidade, brilho, contraste e mesclagem **Normal / Multiply / Overlay / Screen**. Também é possível duplicar ou excluir. A base original é protegida contra exclusão e pintura direta.
-- **Texto (T)** e **Imagem (D)**: clique/arraste para posicionar a prévia e use **Aplicar**. Depois de aplicar, selecione a camada novamente para editar. O texto preserva conteúdo, fonte, tamanho, negrito, cor, opacidade, contorno e sombra.
-- **Selecionar / mover (A)**: arraste um texto, imagem ou forma no 3D ou UV para movê-lo. Também há campos de X/Y, largura, altura e rotação. Setas movem 1 pixel; Shift+seta move 10 pixels. O tamanho do texto é controlado pela fonte.
+- **Texto (T)** e **Imagem (G)**: clique/arraste para posicionar a prévia e use **Aplicar**. Depois de aplicar, selecione a camada novamente para editar. O texto preserva conteúdo, fonte, tamanho, negrito, cor, opacidade, contorno e sombra.
+- **Selecionar / mover (Q)**: arraste um texto, imagem ou forma no 3D ou UV para movê-lo. Também há campos de X/Y, largura, altura e rotação. Setas movem 1 pixel; Shift+seta move 10 pixels. O tamanho do texto é controlado pela fonte.
 - **Ctrl+Z / Ctrl+Shift+Z** desfaz/refaz alterações de camadas e desenho. Escape cancela a criação ou o arraste atual.
 
 ### Fontes locais, contorno e sombra
@@ -43,6 +43,8 @@ Na ferramenta de texto, **Carregar fonte .ttf / .otf** importa uma fonte do comp
 Superfícies que compartilham os mesmos pixels UV recebem a mesma pintura. Uma máscara não separa superfícies com UV sobreposto. Costuras e ilhas UV podem separar ou distorcer texto, linhas e imagens no 3D; use o mapa para posicionar a arte com precisão.
 
 ## Câmeras e iluminação
+
+Segure **W/S** para mover a câmera para cima/baixo e **A/D** para esquerda/direita no espaço da tela. Funciona no editor 3D, em perspectiva e nas vistas ortográficas, sem girar o veículo. O movimento acompanha o zoom e para ao soltar a tecla, trocar de janela ou digitar em campos. **Q** seleciona/move objetos e **G** ativa imagens.
 
 Os botões acima do viewport alternam para vistas **ortográficas** de Frente, Trás, Esquerda, Direita e Teto. **Centralizar / Perspectiva livre** volta à câmera de perspectiva. A iluminação pode ser **Estúdio**, **Dia** ou **Noite**, inclusive pelo seletor rápido no viewport. São cenários de prévia estática; a conferência final da pintura deve ser feita no jogo.
 

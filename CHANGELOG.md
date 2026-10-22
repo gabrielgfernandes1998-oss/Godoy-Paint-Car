@@ -1,3 +1,9 @@
+# Godoy Paint Car 0.4.3
+
+- Pan contínuo da câmera com WASD nos eixos da tela, em perspectiva e nas vistas ortográficas.
+- Velocidade proporcional ao zoom; navegação suspensa em campos de edição, no UV e durante arrastes de pintura.
+- Selecionar/mover passa para Q; imagem passa para G, liberando A/D para navegação.
+
 # Godoy Paint Car 0.4.2
 
 - Logo original Godoy Paint Car na interface, mantendo o crédito Developed By Gabriel Godoy.

@@ -37,7 +37,7 @@ export class AdvancedEditor {
   }
   bindUI() {
     const buttons = [
-      ["select", "↖", "Selecionar / mover (A)"],
+      ["select", "↖", "Selecionar / mover (Q)"],
       ["rect", "▭", "Retângulo (R)"],
       ["ellipse", "◯", "Círculo / elipse (C)"],
       ["pen", "⌁", "Caneta Bézier (P)"],
