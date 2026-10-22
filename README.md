@@ -61,7 +61,7 @@ Os botões acima do viewport alternam para vistas **ortográficas** de Frente, T
 - YDD versão 165 e GLB/GLTF com recursos incorporados e UV também são aceitos.
 - Visualização estática simplificada: shaders GTA completos, transparência de vidros, animação, deformação, física e peças de dano destacadas não são reproduzidos. Transformações esqueléticas adicionais não são aplicadas. Outros modelos podem exigir suporte específico. Texturas compartilhadas ausentes aparecem com material neutro.
 - Enhanced/Gen9, BC7, RPF e recursos protegidos/criptografados não são suportados.
-- Até 80 MB por arquivo/projeto, 256 MB por recurso descomprimido, 8192 pixels por lado e 16 megapixels por textura. Cache de texturas de 32 megapixels; até 48 camadas por textura, 32 megapixels em camadas de pintura e 64 megapixels em bitmaps/máscaras de um documento. Histórico de até 12 ações, também limitado pela memória. Até 16 fontes locais de 10 MB cada. Projetos grandes podem exigir trabalhar em texturas separadas.
+- Até 80 MB por arquivo/projeto, 256 MB por recurso descomprimido, 8192 pixels por lado e 16 megapixels por textura ou imagem de camada. Cache de texturas de 32 megapixels; até 48 camadas por textura, 32 megapixels em camadas de pintura e 64 megapixels em bitmaps/máscaras de um documento. Histórico de até 12 ações, também limitado pela memória. Até 16 fontes locais de 10 MB cada. Projetos grandes podem exigir trabalhar em texturas separadas.
 - DXT é uma compressão com perda. Confira o resultado no jogo antes de substituir os arquivos de distribuição.
 
 ## Desenvolvimento e validação

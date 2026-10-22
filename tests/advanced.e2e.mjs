@@ -339,6 +339,30 @@ try {
   await page.click("[data-layer-type=image]");
   await input("#object-x", 48);
   assert.equal(Number(await page.locator("#object-x").inputValue()), 48);
+  const widePNG = await page.evaluate(() => {
+    const c = document.createElement("canvas");
+    c.width = 9000;
+    c.height = 1;
+    return c.toDataURL().split(",")[1];
+  });
+  const imageCount = await page.locator("[data-layer-type=image]").count();
+  await page
+    .locator("#image-file")
+    .setInputFiles({
+      name: "too-wide.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(widePNG, "base64"),
+    });
+  await page.waitForFunction(() =>
+    document
+      .querySelector("#toast")
+      .textContent.includes("Imagem de camada acima do limite"),
+  );
+  assert.equal(
+    await page.locator("[data-layer-type=image]").count(),
+    imageCount,
+    "Imagem inválida alterou camadas existentes",
+  );
   await page.click("[data-tool=pen]");
   await color("#00ffff");
   await input("#shape-stroke", 2);

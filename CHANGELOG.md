@@ -1,3 +1,8 @@
+# Godoy Paint Car 0.4.1
+
+- Valida resolução e tamanho das imagens importadas como camadas, preservando a compatibilidade dos projetos ao reabrir.
+- Testa a rejeição de uma imagem acima do limite sem alterar as camadas existentes.
+
 # Godoy Paint Car 0.4.0
 
 - Camadas editáveis por textura: criação, duplicação, ordem, visibilidade, nome e exclusão.
