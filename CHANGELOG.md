@@ -1,3 +1,8 @@
+# Godoy Paint Car 0.4.2
+
+- Logo original Godoy Paint Car na interface, mantendo o crédito Developed By Gabriel Godoy.
+- Ícone original G amarelo no executável, na janela e na barra de tarefas do Windows; favicon no navegador.
+
 # Godoy Paint Car 0.4.1
 
 - Valida resolução e tamanho das imagens importadas como camadas, preservando a compatibilidade dos projetos ao reabrir.

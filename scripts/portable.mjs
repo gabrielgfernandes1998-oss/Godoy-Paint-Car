@@ -12,6 +12,7 @@ await mkdir(path.join(stage, "dist"), { recursive: true });
 await cp(path.join(root, "dist"), path.join(stage, "dist"), {
   recursive: true,
 });
+await cp(path.join(root, "assets"), path.join(stage, "assets"), { recursive: true });
 await copyFile("electron.cjs", path.join(stage, "electron.cjs"));
 await writeFile(
   path.join(stage, "package.json"),
@@ -28,6 +29,7 @@ const paths = await packager({
   dir: stage,
   name: "Godoy Paint Car",
   executableName: "GodoyPaintCar",
+  icon: path.join(root, "assets", "app-icon.ico"),
   platform: "win32",
   arch: "x64",
   electronVersion: "45.0.0",

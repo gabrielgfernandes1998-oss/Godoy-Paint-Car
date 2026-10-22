@@ -2,6 +2,7 @@ const { app, BrowserWindow, dialog } = require("electron");
 const path = require("node:path");
 let mainWindow;
 app.setName("Godoy Paint Car");
+if (process.platform === "win32") app.setAppUserModelId("com.gabrielgodoy.godoypaintcar");
 app.whenReady().then(() => {
   mainWindow = new BrowserWindow({
     width: 1440,
@@ -11,6 +12,7 @@ app.whenReady().then(() => {
     backgroundColor: "#111214",
     title: "Godoy Paint Car",
     autoHideMenuBar: true,
+    icon: path.join(__dirname, "assets", "app-icon.png"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
