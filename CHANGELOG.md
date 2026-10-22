@@ -1,3 +1,8 @@
+# Godoy Paint Car 0.3.1
+
+- Tema vermelho e preto nos painéis, botões, destaques e avisos.
+- Crédito “Developed By Gabriel Godoy” abaixo do logo, incluindo telas menores.
+
 # Godoy Paint Car 0.3.0
 
 - Corrige o botão fechar: confirmação nativa para alterações não salvas, com opção de continuar editando ou sair.

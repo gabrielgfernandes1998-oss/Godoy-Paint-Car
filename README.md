@@ -1,6 +1,6 @@
 # Godoy Paint Car
 
-Editor local de pinturas de viaturas GTA V Legacy/FiveM, baseado no [PAINTFIVE](https://github.com/gabrielgfernandes1998-oss/PAINTFIVE), revisão `5bc7e528fd6fcb1d56cc986125c241405fe884af`.
+Editor local de pinturas de viaturas GTA V Legacy/FiveM, com tema vermelho e preto e crédito “Developed By Gabriel Godoy” abaixo do logo. Baseado no [PAINTFIVE](https://github.com/gabrielgfernandes1998-oss/PAINTFIVE), revisão `5bc7e528fd6fcb1d56cc986125c241405fe884af`.
 
 ## Windows portable
 
