@@ -1,3 +1,17 @@
+# Godoy Paint Car 0.4.0
+
+- Camadas editáveis por textura: criação, duplicação, ordem, visibilidade, nome e exclusão.
+- Mesclagem Normal, Multiply, Overlay e Screen; opacidade, brilho e contraste por camada.
+- Texto, imagens e formas permanecem objetos editáveis: mover no 3D/UV ou ajustar coordenadas e dimensões.
+- Fontes TTF/OTF locais incorporadas ao projeto, contorno e sombra de texto.
+- Linhas, retângulos, elipses e caneta Bézier com edição de nós e alças.
+- Preenchimento contíguo com tolerância e preenchimento por material.
+- Seleção de ilhas UV como máscara; pintura restrita à região selecionada.
+- Vistas ortográficas Frente, Trás, Esquerda, Direita e Teto, com acesso rápido no viewport.
+- Iluminação de estúdio, dia e noite.
+- Projeto .paintfive versão 3 preserva camadas, vetores, fontes e visualização. Projetos antigos continuam abrindo como pixels.
+- Testes de composição, máscaras, edição posterior, fontes locais, Bézier, câmeras, iluminação e exportação YTD.
+
 # Godoy Paint Car 0.3.1
 
 - Tema vermelho e preto nos painéis, botões, destaques e avisos.

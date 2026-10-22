@@ -1,3 +1,5 @@
+import { AdvancedEditor } from "./editor/advanced.js";
+import { LayerDocument } from "./editor/layers.js";
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -67,7 +69,7 @@ document.querySelector("#app").innerHTML = `
 <header><div class="brand-lockup"><div class="brand"><div class="brand-mark">P</div>GODOY<em>PAINT CAR</em></div><div class="brand-credit">Developed By Gabriel Godoy</div></div><div class="header-divider"></div><div class="project-title">Pintura de viatura <small>Vehicle Studio / Projeto local</small></div><div class="header-actions"><button id="save-project">${icon("save")}<span>Salvar projeto</span></button><button id="export" class="accent">${icon("download")}<span>Exportar textura</span></button><div class="avatar">PF</div></div></header>
 <div class="workspace"><aside class="left"><div class="panel-head"><span class="eyebrow">EXPLORADOR</span><span class="count">01</span></div><div class="asset"><div class="asset-icon">${icon("car")}</div><div><strong id="asset-name">Viatura demonstrativa</strong><small id="asset-type">MODELO DE DEMONSTRAÇÃO</small></div><div class="dot"></div></div><div class="section"><button class="upload" id="import-model">${icon("folder-open")} Importar modelo</button><p class="file-note">YFT / YDD / GLB / GLTF · Projeto .paintfive<br>YFT / YTD nativos · GTA V Legacy / FiveM</p></div><div id="native-model-controls" class="section hidden"><label class="section-title" for="drawable-select">MODELO / FRAGMENTO</label><select id="drawable-select" class="full"></select><label class="section-title" for="lod-select" style="margin-top:14px">NÍVEL DE DETALHE</label><select id="lod-select" class="full"></select></div><div class="panel-head"><span class="eyebrow">TEXTURA</span><span class="count">01</span></div><div class="section" style="padding-top:0"><div class="layer active"><div class="layer-preview"></div><span><span id="texture-name">Diffuse texture</span><small id="texture-dimensions">Canvas editável · 2048 × 2048</small></span>${icon("eye")}</div><button class="upload" id="import-ytd">${icon("folder-open")} Abrir dicionário YTD</button><div id="native-texture-controls" class="hidden"><label class="section-title" for="texture-select" style="margin-top:15px">TEXTURAS DO DICIONÁRIO</label><select id="texture-select" class="full"></select><p id="native-texture-info" class="help"></p><label class="section-title" for="material-select">APLICAR NA VIATURA</label><select id="material-select" class="full"><option value="all">Todas as superfícies</option></select><button id="bind-texture" class="full" style="margin-top:8px">Vincular textura selecionada</button><button id="export-native" class="accent full" style="margin-top:10px">Exportar YTD editado</button><p class="file-note">Salva uma cópia. O arquivo original é preservado.</p></div><button class="upload" id="import-texture" style="margin-top:10px">${icon("image-plus")} Abrir textura PNG / JPG</button></div><div class="panel-head"><span class="eyebrow">BIBLIOTECA</span>${icon("images")}</div><div class="section" style="padding-top:0"><button class="upload" id="import-image">${icon("plus")} Adicionar imagem</button><p class="file-note">Aplique uma arte na viatura e ajuste sua posição diretamente no modelo.</p></div><div class="info-card"><strong>${icon("sparkles")} Sua ideia. Na superfície.</strong><p>Pinte no 3D e acompanhe cada alteração no mapa de textura, em tempo real.</p></div></aside>
 <main class="center"><div class="viewbar"><div class="tabs"><button id="tab-3d" class="active">${icon("box")} Editor 3D</button><button id="tab-uv">${icon("scan")} Mapa UV</button></div><div class="view-meta"><span class="green-dot"></span>Renderização em tempo real</div></div><div class="viewport"><canvas id="scene"></canvas><canvas id="uv-view" width="2048" height="2048"></canvas><div class="viewport-label"><strong id="view-name">PERSPECTIVA</strong><p>MATERIAL PREVIEW · STUDIO LIGHT</p></div><div class="tools"><button data-tool="orbit" title="Orbitar (V)">${icon("mouse-pointer-2")}</button><div class="tool-divider"></div><button data-tool="brush" class="active" title="Pincel (B)">${icon("paintbrush")}</button><button data-tool="erase" title="Restaurar textura base (E)">${icon("eraser")}</button><button data-tool="text" title="Texto (T)">${icon("type")}</button><button data-tool="line" title="Linha (L)">${icon("minus")}</button><button data-tool="eyedropper" title="Conta-gotas (I)">${icon("pipette")}</button><button data-tool="decal" title="Aplicar imagem (D)">${icon("image")}</button><div class="tool-divider"></div><button id="undo" title="Desfazer (Ctrl+Z)">${icon("undo-2")}</button><button id="redo" title="Refazer (Ctrl+Shift+Z)">${icon("redo-2")}</button></div><div class="view-hint"><kbd>Arraste</kbd> pintar &nbsp;·&nbsp; <kbd>Botão direito</kbd> orbitar &nbsp;·&nbsp; <kbd>Scroll</kbd> zoom</div><div class="axis"><b>Y</b><i>X</i><span>Z</span></div></div><div class="view-bottom"><span>${icon("car")}<span id="mesh-info">Importe o YFT da sua viatura</span></span><button id="reset-view">${icon("focus")} Centralizar</button><span class="badge">● TEXTURA CONECTADA</span></div></main>
-<aside class="right"><div class="panel-head"><span class="prop-title">${icon("sliders-horizontal")} Propriedades</span>${icon("ellipsis")}</div><div class="section"><div class="section-title">FERRAMENTA ATIVA <span class="mini-tag" id="tool-tag">PINCEL</span></div><div class="brush-only"><div class="label-row"><label for="size">Tamanho do pincel</label><output class="value" id="size-out">32 px</output></div><input id="size" type="range" min="2" max="180" value="32"><div class="label-row"><label for="opacity">Opacidade</label><output class="value" id="opacity-out">100%</output></div><input id="opacity" type="range" min="1" max="100" value="100"><div class="label-row"><label for="softness">Suavidade</label><output class="value" id="softness-out">25%</output></div><input id="softness" type="range" min="0" max="95" value="25"></div><div class="text-controls"><label class="section-title" for="text-content">TEXTO</label><textarea id="text-content" maxlength="500" rows="3" placeholder="Digite o texto da viatura">POLÍCIA</textarea><label class="section-title" for="text-font">FONTE</label><select id="text-font" class="full"><option value="Arial">Arial</option><option value="Arial Black">Arial Black</option><option value="Georgia">Georgia</option><option value="monospace">Monoespaçada</option></select><div class="label-row"><label for="text-size">Tamanho na textura (px)</label><input id="text-size" type="number" min="12" max="512" value="96"></div><div class="label-row"><label for="text-bold">Negrito</label><input id="text-bold" type="checkbox" checked></div><div class="label-row"><label for="text-opacity">Opacidade (%)</label><input id="text-opacity" type="number" min="1" max="100" value="100"></div></div><div class="decal-controls"><p class="help">Clique e arraste no 3D ou no mapa para posicionar. Ajuste antes de aplicar.</p><div class="image-scale"><div class="label-row"><label for="scale">Escala</label><output class="value" id="scale-out">30%</output></div><input id="scale" type="range" min="3" max="100" value="30"></div><div class="label-row"><label for="rotation">Rotação</label><output class="value" id="rotation-out">0°</output></div><input id="rotation" type="range" min="-180" max="180" value="0"><button id="apply-decal" class="accent full">${icon("check")} Aplicar imagem</button><button id="cancel-decal" class="full" style="margin-top:8px">Cancelar posicionamento</button></div></div><div class="section brush-only color-section"><div class="section-title">COR</div><div class="colors">${["#c7fa68", "#e9e4d8", "#17191d", "#ef695e", "#86a7ee", "#c19de5"].map((c) => `<button class="swatch" data-color="${c}" style="background:${c}" aria-label="Cor ${c}"></button>`).join("")}</div><div class="color-entry"><input id="color" type="color" value="#c7fa68" aria-label="Cor personalizada"><span id="color-hex">#C7FA68</span></div></div><div class="section"><div class="section-title">MAPA DE TEXTURA <span style="margin-left:auto">${icon("maximize-2")}</span></div><canvas class="map" id="map" width="320" height="320"></canvas><div class="map-footer"><span>DIFFUSE / BASE COLOR</span><span id="map-size">2048²</span></div><p class="help">Abra o YFT da viatura e seu YTD. Selecione a textura para pintar e exporte uma cópia do dicionário editado ou o PNG.</p></div><div class="section"><div class="section-title">VISUALIZAÇÃO</div><button id="back-view" class="full">${icon("rotate-3d")} Alternar frente / verso</button><div class="label-row" style="margin-top:18px"><label for="wireframe">Exibir malha</label><input id="wireframe" type="checkbox"></div></div></aside></div><footer class="footer"><span><span class="green-dot"></span><b id="status">Pronto para criar</b></span><span>GODOY PAINT CAR <span> / </span> LOCAL WORKSPACE <span> / </span> v0.3.1</span></footer><div id="toast" role="status"></div><input type="file" id="model-file" accept=".glb,.gltf,.paintfive,.yft,.ydd,.ytd" hidden><input type="file" id="ytd-file" accept=".ytd" hidden><input type="file" id="texture-file" accept="image/png,image/jpeg,image/webp" hidden><input type="file" id="image-file" accept="image/png,image/jpeg,image/webp" hidden>`;
+<aside class="right"><div class="panel-head"><span class="prop-title">${icon("sliders-horizontal")} Propriedades</span>${icon("ellipsis")}</div><div class="section"><div class="section-title">FERRAMENTA ATIVA <span class="mini-tag" id="tool-tag">PINCEL</span></div><div class="brush-only"><div class="label-row"><label for="size">Tamanho do pincel</label><output class="value" id="size-out">32 px</output></div><input id="size" type="range" min="2" max="180" value="32"><div class="label-row"><label for="opacity">Opacidade</label><output class="value" id="opacity-out">100%</output></div><input id="opacity" type="range" min="1" max="100" value="100"><div class="label-row"><label for="softness">Suavidade</label><output class="value" id="softness-out">25%</output></div><input id="softness" type="range" min="0" max="95" value="25"></div><div class="text-controls"><label class="section-title" for="text-content">TEXTO</label><textarea id="text-content" maxlength="500" rows="3" placeholder="Digite o texto da viatura">POLÍCIA</textarea><label class="section-title" for="text-font">FONTE</label><select id="text-font" class="full"><option value="Arial">Arial</option><option value="Arial Black">Arial Black</option><option value="Georgia">Georgia</option><option value="monospace">Monoespaçada</option></select><div class="label-row"><label for="text-size">Tamanho na textura (px)</label><input id="text-size" type="number" min="12" max="512" value="96"></div><div class="label-row"><label for="text-bold">Negrito</label><input id="text-bold" type="checkbox" checked></div><div class="label-row"><label for="text-opacity">Opacidade (%)</label><input id="text-opacity" type="number" min="1" max="100" value="100"></div></div><div class="decal-controls"><p class="help">Clique e arraste no 3D ou no mapa para posicionar. Ajuste antes de aplicar.</p><div class="image-scale"><div class="label-row"><label for="scale">Escala</label><output class="value" id="scale-out">30%</output></div><input id="scale" type="range" min="3" max="100" value="30"></div><div class="label-row"><label for="rotation">Rotação</label><output class="value" id="rotation-out">0°</output></div><input id="rotation" type="range" min="-180" max="180" value="0"><button id="apply-decal" class="accent full">${icon("check")} Aplicar imagem</button><button id="cancel-decal" class="full" style="margin-top:8px">Cancelar posicionamento</button></div></div><div class="section brush-only color-section"><div class="section-title">COR</div><div class="colors">${["#c7fa68", "#e9e4d8", "#17191d", "#ef695e", "#86a7ee", "#c19de5"].map((c) => `<button class="swatch" data-color="${c}" style="background:${c}" aria-label="Cor ${c}"></button>`).join("")}</div><div class="color-entry"><input id="color" type="color" value="#c7fa68" aria-label="Cor personalizada"><span id="color-hex">#C7FA68</span></div></div><div class="section"><div class="section-title">MAPA DE TEXTURA <span style="margin-left:auto">${icon("maximize-2")}</span></div><canvas class="map" id="map" width="320" height="320"></canvas><div class="map-footer"><span>DIFFUSE / BASE COLOR</span><span id="map-size">2048²</span></div><p class="help">Abra o YFT da viatura e seu YTD. Selecione a textura para pintar e exporte uma cópia do dicionário editado ou o PNG.</p></div><div class="section"><div class="section-title">VISUALIZAÇÃO</div><button id="back-view" class="full">${icon("rotate-3d")} Alternar frente / verso</button><div class="label-row" style="margin-top:18px"><label for="wireframe">Exibir malha</label><input id="wireframe" type="checkbox"></div></div></aside></div><footer class="footer"><span><span class="green-dot"></span><b id="status">Pronto para criar</b></span><span>GODOY PAINT CAR <span> / </span> LOCAL WORKSPACE <span> / </span> v0.4.0</span></footer><div id="toast" role="status"></div><input type="file" id="model-file" accept=".glb,.gltf,.paintfive,.yft,.ydd,.ytd" hidden><input type="file" id="ytd-file" accept=".ytd" hidden><input type="file" id="texture-file" accept="image/png,image/jpeg,image/webp" hidden><input type="file" id="image-file" accept="image/png,image/jpeg,image/webp" hidden>`;
 createIcons({ icons });
 const $ = (s) => document.querySelector(s);
 let toastTimer;
@@ -100,7 +102,7 @@ texture.colorSpace = THREE.SRGBColorSpace;
 texture.anisotropy = 8;
 texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(36, 1, 0.01, 100);
+let camera = new THREE.PerspectiveCamera(36, 1, 0.01, 100);
 camera.position.set(0, 0.3, 5.8);
 let renderer;
 try {
@@ -117,7 +119,8 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.25;
-scene.add(new THREE.HemisphereLight(0xe8efff, 0x6e6657, 2.2));
+const ambient = new THREE.HemisphereLight(0xe8efff, 0x6e6657, 2.2);
+scene.add(ambient);
 const key = new THREE.DirectionalLight(0xfff3df, 3.5);
 key.position.set(2, 4, 5);
 scene.add(key);
@@ -194,29 +197,15 @@ let tool = "brush",
   changed = false,
   showUV = false,
   backView = false;
-let lineStart = null, lineSnapshot = null;
-let decal = null,
-  decalUV = null,
-  decalSnapshot = null;
-const history = [],
-  future = [];
+let editor = null,
+  decal = null;
 let modelSource = null,
   modelFilename = null;
-function snapshot() {
-  return ctx.getImageData(0, 0, size, textureHeight);
-}
-function pushHistory() {
-  markTextureDirty();
-  history.push(snapshot());
-  if (history.length > 12) history.shift();
-  future.length = 0;
-  updateHistory();
-}
 function updateHistory() {
-  $("#undo").disabled = !history.length;
-  $("#redo").disabled = !future.length;
+  if (editor) editor.syncUI();
 }
-function refresh() {
+function refresh(compose = true) {
+  if (editor && compose) editor.doc.render(ctx, editor.draft);
   texture.needsUpdate = true;
   for (const selector of ["#map", "#uv-view"]) {
     const c = $(selector),
@@ -230,114 +219,179 @@ function refresh() {
       h = textureCanvas.height * scale;
     cctx.drawImage(textureCanvas, (c.width - w) / 2, (c.height - h) / 2, w, h);
   }
-  $("#status").textContent = "Alterações locais · textura atualizada";
 }
-refresh();
-updateHistory();
-$("#status").textContent = "Pronto para criar";
 function setTool(next) {
-  if (next !== tool) { cancelDecal(); endStroke(); }
   tool = next;
   document
     .querySelectorAll("[data-tool]")
     .forEach((b) => b.classList.toggle("active", b.dataset.tool === tool));
-  $(".right").classList.toggle("decal-mode", isStamp());
-  $(".right").classList.toggle("text-mode", tool === "text");
-  $("#apply-decal").textContent = tool === "text" ? "Aplicar texto" : "Aplicar imagem";
-  $("#tool-tag").textContent = {
-    brush: "PINCEL",
-    erase: "RESTAURAR",
-    orbit: "NAVEGAR",
-    decal: "IMAGEM",
-    text: "TEXTO",
-    line: "LINHA",
-    eyedropper: "CONTA-GOTAS",
-  }[tool];
+  $("#tool-tag").textContent =
+    {
+      brush: "PINCEL",
+      erase: "BORRACHA",
+      orbit: "NAVEGAR",
+      text: "TEXTO",
+      decal: "IMAGEM",
+      line: "LINHA",
+      eyedropper: "CONTA-GOTAS",
+      select: "MOVER / EDITAR",
+      rect: "RETÂNGULO",
+      ellipse: "ELIPSE",
+      pen: "BÉZIER",
+      bucket: "PREENCHIMENTO",
+      island: "ILHA UV",
+    }[tool] || tool;
   controls.mouseButtons.LEFT = tool === "orbit" ? THREE.MOUSE.ROTATE : null;
   $("#scene").style.cursor = tool === "orbit" ? "grab" : "crosshair";
-  if (tool === "decal" && !decal)
-    toast("Adicione uma imagem para posicioná-la sobre a viatura.");
+  editor?.setTool(next);
 }
-document.querySelectorAll("[data-tool]").forEach(
-  (b) =>
-    (b.onclick = () => {
-      setTool(b.dataset.tool);
-      if (tool === "decal" && !decal) $("#image-file").click();
-    }),
-);
+function uvHit(event) {
+  const r = $("#uv-view").getBoundingClientRect(),
+    scale = Math.min(r.width / size, r.height / textureHeight),
+    w = size * scale,
+    h = textureHeight * scale;
+  const x = event.clientX - r.left - (r.width - w) / 2,
+    y = event.clientY - r.top - (r.height - h) / 2;
+  return x >= 0 && y >= 0 && x <= w && y <= h
+    ? new THREE.Vector2(x / w, 1 - y / h)
+    : null;
+}
+function sceneHit(event) {
+  const r = $("#scene").getBoundingClientRect();
+  pointer.set(
+    ((event.clientX - r.left) / r.width) * 2 - 1,
+    -((event.clientY - r.top) / r.height) * 2 + 1,
+  );
+  raycaster.setFromCamera(pointer, camera);
+  const first = raycaster.intersectObject(model, true).find((h) => h.uv);
+  if (!first || first.object.material.map !== texture) return null;
+  const uv = first.uv.clone();
+  uv.set(
+    THREE.MathUtils.euclideanModulo(uv.x, 1),
+    THREE.MathUtils.euclideanModulo(uv.y, 1),
+  );
+  return { uv, mesh: first.object, face: first.faceIndex };
+}
+function sampleColor(uv) {
+  const x = Math.max(0, Math.min(size - 1, Math.floor(uv.x * size))),
+    y = Math.max(
+      0,
+      Math.min(textureHeight - 1, Math.floor((1 - uv.y) * textureHeight)),
+    );
+  const rgb = ctx.getImageData(x, y, 1, 1).data;
+  $("#color").value =
+    "#" +
+    [...rgb]
+      .slice(0, 3)
+      .map((v) => v.toString(16).padStart(2, "0"))
+      .join("");
+  $("#color-hex").textContent = $("#color").value.toUpperCase();
+  toast("Cor capturada: " + $("#color-hex").textContent);
+}
+for (const surface of [$("#scene"), $("#uv-view")]) {
+  const coordinates = (e) =>
+    surface.id === "scene" ? sceneHit(e) : { uv: uvHit(e) };
+  surface.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || tool === "orbit" || !editor) return;
+    try {
+      const hit = coordinates(e);
+      if (!hit?.uv) return;
+      if (tool === "eyedropper") {
+        sampleColor(hit.uv);
+        return;
+      }
+      if (document.activeElement instanceof HTMLElement)
+        document.activeElement.blur();
+      surface.setPointerCapture(e.pointerId);
+      controls.enabled = false;
+      editor.begin(hit.uv, hit);
+      painting = !!editor.drag;
+    } catch (err) {
+      toast(err.message);
+      controls.enabled = true;
+    }
+  });
+  surface.addEventListener("pointermove", (e) => {
+    if (!painting) return;
+    try {
+      const hit = coordinates(e);
+      if (hit?.uv) editor.move(hit.uv);
+    } catch (err) {
+      toast(err.message);
+    }
+  });
+  surface.addEventListener("pointercancel", () => {
+    cancelDecal();
+    endStroke();
+  });
+  surface.addEventListener("lostpointercapture", endStroke);
+  surface.addEventListener("contextmenu", (e) => e.preventDefault());
+}
+function endStroke() {
+  try {
+    if (painting || editor?.drag) editor?.end();
+  } catch (err) {
+    if (editor) editor.drag = null;
+    toast(err.message);
+  } finally {
+    painting = false;
+    controls.enabled = true;
+  }
+}
+window.addEventListener("pointerup", endStroke);
+function cancelDecal() {
+  editor?.cancel();
+  painting = false;
+  controls.enabled = true;
+}
+$("#cancel-decal").onclick = () => {
+  cancelDecal();
+  setTool("brush");
+};
+$("#apply-decal").onclick = () => editor?.attempt(() => editor.apply());
+$("#undo").onclick = () => {
+  cancelDecal();
+  editor?.doc.undo();
+};
+$("#redo").onclick = () => {
+  cancelDecal();
+  editor?.doc.redo();
+};
 for (const id of ["size", "opacity", "softness", "scale", "rotation"]) {
   $("#" + id).oninput = (e) => {
     $("#" + id + "-out").textContent =
       e.target.value + ({ size: " px", rotation: "°" }[id] || "%");
-    if (isStamp() && decalUV) previewDecal();
+    if (id === "size" && tool === "line")
+      $("#shape-stroke").value = e.target.value;
+    if (id === "rotation")
+      editor?.modifyObject({ rotation: Number(e.target.value) }, id);
+    if (
+      id === "scale" &&
+      (editor?.draft?.type === "image" || editor?.doc.active?.type === "image")
+    ) {
+      const l = editor.draft || editor.doc.active,
+        w = (size * Number(e.target.value)) / 100;
+      editor.modifyObject(
+        { width: w, height: (w * l.canvas.height) / l.canvas.width },
+        id,
+      );
+    }
   };
 }
 $("#color").oninput = (e) => {
   $("#color-hex").textContent = e.target.value.toUpperCase();
-  if (tool === "text" && decalUV) previewDecal();
+  if (["text", "select"].includes(tool))
+    editor?.modifyObject(
+      {
+        color: e.target.value,
+        strokeColor:
+          editor.draft?.type === "text" || editor.doc.active?.type === "text"
+            ? $("#text-stroke-color").value
+            : e.target.value,
+      },
+      "color",
+    );
 };
-for (const id of ["text-content", "text-font", "text-size", "text-bold", "text-opacity"]) {
-  $("#" + id).addEventListener("input", () => { if (tool === "text" && decalUV) previewDecal(); });
-}
-function isStamp() { return tool === "decal" || tool === "text"; }
-function textStamp() {
-  const lines = $("#text-content").value.slice(0, 500).split("\n");
-  if (!lines.some(line => line.trim())) return null;
-  const fontSize = Math.max(12, Math.min(512, Number($("#text-size").value) || 96));
-  const font = `${$("#text-bold").checked ? "bold " : ""}${fontSize}px "${$("#text-font").value}"`;
-  const canvas = document.createElement("canvas"), c = canvas.getContext("2d");
-  c.font = font;
-  const padding = Math.ceil(fontSize * 0.25);
-  canvas.width = Math.min(8192, Math.max(1, Math.ceil(Math.max(...lines.map(line => c.measureText(line).width))) + padding * 2));
-  canvas.height = Math.min(2048, Math.ceil(lines.length * fontSize * 1.25 + padding * 2));
-  c.font = font;
-  c.textBaseline = "top";
-  c.fillStyle = $("#color").value;
-  lines.forEach((line, i) => c.fillText(line, padding, padding + i * fontSize * 1.25));
-  return canvas;
-}
-function uvHit(event) {
-  const r = $("#uv-view").getBoundingClientRect();
-  const scale = Math.min(r.width / size, r.height / textureHeight);
-  const w = size * scale, h = textureHeight * scale;
-  const x = event.clientX - r.left - (r.width - w) / 2;
-  const y = event.clientY - r.top - (r.height - h) / 2;
-  return x >= 0 && y >= 0 && x <= w && y <= h ? new THREE.Vector2(x / w, 1 - y / h) : null;
-}
-function sampleColor(uv) {
-  const x = Math.max(0, Math.min(size - 1, Math.floor(uv.x * size)));
-  const y = Math.max(0, Math.min(textureHeight - 1, Math.floor((1 - uv.y) * textureHeight)));
-  const rgb = ctx.getImageData(x, y, 1, 1).data;
-  const color = "#" + [...rgb].slice(0, 3).map(v => v.toString(16).padStart(2, "0")).join("");
-  $("#color").value = color;
-  $("#color").dispatchEvent(new Event("input"));
-  toast(`Cor capturada: ${color.toUpperCase()}`);
-}
-function previewLine(uv) {
-  if (!lineSnapshot || !lineStart) return;
-  ctx.putImageData(lineSnapshot, 0, 0);
-  ctx.save();
-  ctx.globalAlpha = Number($("#opacity").value) / 100;
-  ctx.strokeStyle = $("#color").value;
-  ctx.lineWidth = Number($("#size").value);
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.moveTo(lineStart.x * size, (1 - lineStart.y) * textureHeight);
-  ctx.lineTo(uv.x * size, (1 - uv.y) * textureHeight);
-  ctx.stroke();
-  ctx.restore();
-  refresh();
-}
-function cancelLine() {
-  if (lineSnapshot) {
-    ctx.putImageData(lineSnapshot, 0, 0);
-    lineSnapshot = lineStart = null;
-    painting = false;
-    controls.enabled = true;
-    refresh();
-  }
-}
-
 document.querySelectorAll("[data-color]").forEach(
   (b) =>
     (b.onclick = () => {
@@ -345,189 +399,7 @@ document.querySelectorAll("[data-color]").forEach(
       $("#color").dispatchEvent(new Event("input"));
     }),
 );
-function hit(event) {
-  const rect = $("#scene").getBoundingClientRect();
-  pointer.set(
-    ((event.clientX - rect.left) / rect.width) * 2 - 1,
-    (-(event.clientY - rect.top) / rect.height) * 2 + 1,
-  );
-  raycaster.setFromCamera(pointer, camera);
-  const first = raycaster.intersectObject(model, true).find((h) => h.uv);
-  if (!first || first.object.material.map !== texture) return null;
-  const uv = first.uv.clone();
-  uv.set(THREE.MathUtils.euclideanModulo(uv.x, 1), THREE.MathUtils.euclideanModulo(uv.y, 1));
-  return uv;
-}
-function dab(u, v) {
-  const x = u * size,
-    y = (1 - v) * textureHeight,
-    r = Number($("#size").value) / 2;
-  ctx.save();
-  ctx.globalAlpha = Number($("#opacity").value) / 100;
-  if (tool === "erase") {
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.clearRect(0, 0, size, textureHeight);
-    ctx.drawImage(base, 0, 0);
-  } else {
-    const soft = Number($("#softness").value) / 100,
-      color = $("#color").value;
-    const gradient = ctx.createRadialGradient(
-      x,
-      y,
-      Math.max(0.01, r * (1 - soft)),
-      x,
-      y,
-      r,
-    );
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(1, color + "00");
-    ctx.fillStyle = soft ? gradient : color;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-function paint(uv) {
-  if (lastUV && lastUV.distanceTo(uv) < 0.1) {
-    const distance = Math.hypot(
-      (lastUV.x - uv.x) * size,
-      (lastUV.y - uv.y) * textureHeight,
-    );
-    const steps = Math.max(
-      1,
-      Math.ceil(distance / (Number($("#size").value) * 0.18)),
-    );
-    for (let i = 1; i <= steps; i++)
-      dab(
-        THREE.MathUtils.lerp(lastUV.x, uv.x, i / steps),
-        THREE.MathUtils.lerp(lastUV.y, uv.y, i / steps),
-      );
-  } else dab(uv.x, uv.y);
-  lastUV = uv.clone();
-  refresh();
-}
-for (const surface of [$("#scene"), $("#uv-view")]) {
-  const coordinates = event => surface.id === "uv-view" ? uvHit(event) : hit(event);
-  surface.addEventListener("pointerdown", e => {
-    if (e.button !== 0 || tool === "orbit") return;
-    const uv = coordinates(e);
-    if (!uv) return;
-    if (tool === "eyedropper") { sampleColor(uv); return; }
-    if (isStamp() && !(tool === "text" ? textStamp() : decal)) {
-      toast(tool === "text" ? "Digite um texto antes de posicionar." : "Adicione uma imagem primeiro.");
-      return;
-    }
-    e.preventDefault();
-    painting = true;
-    surface.setPointerCapture(e.pointerId);
-    controls.enabled = false;
-    if (isStamp()) {
-      if (!decalSnapshot) decalSnapshot = snapshot();
-      decalUV = uv.clone();
-      previewDecal();
-    } else if (tool === "line") {
-      lineStart = uv.clone();
-      lineSnapshot = snapshot();
-      previewLine(uv);
-    } else {
-      pushHistory();
-      paint(uv);
-      changed = true;
-    }
-  });
-  surface.addEventListener("pointermove", e => {
-    if (!painting) return;
-    const uv = coordinates(e);
-    if (!uv) { lastUV = null; return; }
-    if (isStamp()) { decalUV = uv.clone(); previewDecal(); }
-    else if (tool === "line") previewLine(uv);
-    else paint(uv);
-  });
-  surface.addEventListener("pointercancel", () => { cancelLine(); endStroke(); });
-  surface.addEventListener("lostpointercapture", endStroke);
-  surface.addEventListener("contextmenu", e => e.preventDefault());
-}
-function endStroke() {
-  if (lineSnapshot) {
-    history.push(lineSnapshot);
-    if (history.length > 12) history.shift();
-    future.length = 0;
-    lineSnapshot = lineStart = null;
-    markTextureDirty();
-    changed = true;
-    updateHistory();
-  }
-  painting = false;
-  lastUV = null;
-  controls.enabled = true;
-}
-window.addEventListener("pointerup", endStroke);
-function previewDecal() {
-  if (!decalSnapshot || !decalUV) return;
-  ctx.putImageData(decalSnapshot, 0, 0);
-  const stamp = tool === "text" ? textStamp() : decal;
-  if (!stamp) { refresh(); return; }
-  const width = tool === "text" ? stamp.width : (size * Number($("#scale").value)) / 100;
-  const height = (width * stamp.height) / stamp.width;
-  ctx.save();
-  ctx.translate(decalUV.x * size, (1 - decalUV.y) * textureHeight);
-  ctx.rotate((Number($("#rotation").value) * Math.PI) / 180);
-  ctx.globalAlpha = tool === "text" ? Math.max(0.01, Math.min(1, Number($("#text-opacity").value) / 100 || 1)) : 1;
-  ctx.drawImage(stamp, -width / 2, -height / 2, width, height);
-  ctx.restore();
-  refresh();
-}
-function cancelDecal() {
-  cancelLine();
-  if (decalSnapshot) {
-    ctx.putImageData(decalSnapshot, 0, 0);
-    decalSnapshot = null;
-    decalUV = null;
-    refresh();
-  }
-}
-$("#cancel-decal").onclick = () => {
-  cancelDecal();
-  setTool("brush");
-};
-$("#apply-decal").onclick = () => {
-  if (!decalSnapshot)
-    return toast("Clique no 3D ou na textura para posicionar primeiro.");
-  markTextureDirty();
-  history.push(decalSnapshot);
-  if (history.length > 12) history.shift();
-  future.length = 0;
-  decalSnapshot = null;
-  decalUV = null;
-  changed = true;
-  updateHistory();
-  const applied = tool === "text" ? "Texto aplicado" : "Imagem aplicada";
-  setTool("brush");
-  toast(`${applied} ao mapa de textura.`);
-};
-$("#undo").onclick = () => {
-  cancelDecal();
-  if (!history.length) return;
-  changed = true;
-  markTextureDirty();
-  future.push(snapshot());
-  ctx.putImageData(history.pop(), 0, 0);
-  refresh();
-  updateHistory();
-};
-$("#redo").onclick = () => {
-  cancelDecal();
-  if (!future.length) return;
-  changed = true;
-  markTextureDirty();
-  history.push(snapshot());
-  ctx.putImageData(future.pop(), 0, 0);
-  refresh();
-  updateHistory();
-};
+refresh();
 function view(uv) {
   showUV = uv;
   $("#uv-view").style.display = uv ? "block" : "none";
@@ -536,20 +408,28 @@ function view(uv) {
   $(".view-hint").style.display = uv ? "none" : "block";
   $("#tab-uv").classList.toggle("active", uv);
   $("#tab-3d").classList.toggle("active", !uv);
-  $("#view-name").textContent = uv ? `MAPA UV · ${size} × ${textureHeight}` : "PERSPECTIVA";
+  $("#view-name").textContent = uv
+    ? `MAPA UV · ${size} × ${textureHeight}`
+    : "PERSPECTIVA";
+  if (editor) {
+    editor.overlayCanvas.style.display = uv ? "block" : "none";
+    if (uv) editor.overlay();
+  }
 }
 $("#tab-3d").onclick = () => view(false);
 $("#tab-uv").onclick = () => view(true);
 $("#map").onclick = () => view(true);
 $("#reset-view").onclick = () => {
-  if (/\.yft$/i.test($("#asset-name").textContent)) camera.position.set(2.8, 1.25, 3.1);
+  if (/\.yft$/i.test($("#asset-name").textContent))
+    camera.position.set(2.8, 1.25, 3.1);
   else camera.position.set(0, 0.3, 5.8);
   controls.target.set(0, 0.05, 0);
   backView = false;
 };
 $("#back-view").onclick = () => {
   backView = !backView;
-  if (/\.yft$/i.test($("#asset-name").textContent)) camera.position.set(backView ? -2.8 : 2.8, 1.25, backView ? -3.1 : 3.1);
+  if (/\.yft$/i.test($("#asset-name").textContent))
+    camera.position.set(backView ? -2.8 : 2.8, 1.25, backView ? -3.1 : 3.1);
   else camera.position.set(0, 0.3, backView ? -5.8 : 5.8);
   controls.target.set(0, 0.05, 0);
 };
@@ -566,8 +446,8 @@ const download = (name, blob) => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 $("#export").onclick = () => {
-  if (decalSnapshot)
-    return toast("Aplique ou cancele o texto/imagem antes de exportar.");
+  if (editor?.pending())
+    return toast("Conclua ou cancele a criação atual antes de exportar.");
   textureCanvas.toBlob(
     (blob) =>
       download(
@@ -623,15 +503,23 @@ $("#texture-file").onchange = async (e) => {
   try {
     const img = await readImage(file);
     cancelDecal();
-    if (!nativeTextures) {
+    if (
+      !nativeTextures &&
+      (img.width !== size || img.height !== textureHeight)
+    ) {
       resizeTexture(img.width, img.height);
-      history.length = future.length = 0;
-      updateHistory();
-    } else pushHistory();
-    ctx.clearRect(0, 0, size, textureHeight);
-    ctx.drawImage(img, 0, 0, size, textureHeight);
-    baseCtx.clearRect(0, 0, size, textureHeight);
-    baseCtx.drawImage(textureCanvas, 0, 0);
+      const source = document.createElement("canvas");
+      source.width = size;
+      source.height = textureHeight;
+      source.getContext("2d").drawImage(img, 0, 0, size, textureHeight);
+      editor.reset(source);
+    } else {
+      const source = document.createElement("canvas");
+      source.width = size;
+      source.height = textureHeight;
+      source.getContext("2d").drawImage(img, 0, 0, size, textureHeight);
+      editor.doc.add("raster", { name: file.name, canvas: source });
+    }
     refresh();
     changed = true;
     toast(
@@ -761,6 +649,7 @@ function flushTexture() {
     state.canvas.getContext("2d").clearRect(0, 0, size, textureHeight);
     state.canvas.getContext("2d").drawImage(textureCanvas, 0, 0);
     state.base = copyCanvas(base);
+    state.document = editor?.doc;
     state.map.needsUpdate = true;
   }
 }
@@ -772,9 +661,12 @@ function textureState(entry) {
   );
   if (pixelsInCache + entry.width * entry.height > 33554432) {
     const displayed = new Set();
-    model.traverse(m => { if (m.isMesh && m.material.map) displayed.add(m.material.map); });
+    model.traverse((m) => {
+      if (m.isMesh && m.material.map) displayed.add(m.material.map);
+    });
     for (const [key, state] of textureStates) {
-      if (state.dirty || key === activeKey || displayed.has(state.map)) continue;
+      if (state.dirty || key === activeKey || displayed.has(state.map))
+        continue;
       pixelsInCache -= state.canvas.width * state.canvas.height;
       state.map.dispose();
       textureStates.delete(key);
@@ -854,7 +746,7 @@ function selectTexture(key, { flush = true } = {}) {
   if (flush) flushTexture();
   activeKey = key;
   if (nativeModel?.format === "yft") {
-    const family = name => name.toLowerCase().replace(/_\d+$/, "");
+    const family = (name) => name.toLowerCase().replace(/_\d+$/, "");
     nativeModel.drawables[nativeModelIndex].shaders.forEach((shader, index) => {
       if (shader.liveryName && family(shader.liveryName) === family(entry.name))
         materialBindings.set(`${nativeModelIndex}:${index}`, entry.key);
@@ -863,12 +755,15 @@ function selectTexture(key, { flush = true } = {}) {
   resizeTexture(entry.width, entry.height);
   ctx.drawImage(state.canvas, 0, 0);
   baseCtx.drawImage(state.base, 0, 0);
-  history.length = future.length = 0;
+  if (editor) {
+    if (!state.document) state.document = new LayerDocument(state.canvas);
+    editor.setDocument(state.document);
+  }
   updateHistory();
   $("#texture-select").value = key;
   $("#texture-name").textContent = entry.name;
   $("#native-texture-info").textContent =
-    `${entry.formatName} · ${entry.width} × ${entry.height} · ${entry.levels} mipmap(s). O histórico é separado a cada troca de textura.`;
+    `${entry.formatName} · ${entry.width} × ${entry.height} · ${entry.levels} mipmap(s). Camadas e histórico pertencem a esta textura.`;
   $("#export-native").disabled = false;
   refresh();
   updateNativeMaterials();
@@ -890,15 +785,23 @@ function resetMaterialOptions() {
         ),
       );
     });
-    const liveryIndex = drawable.shaders.findIndex(s => nativeModel.format === "yft" && s.liveryName);
+    const liveryIndex = drawable.shaders.findIndex(
+      (s) => nativeModel.format === "yft" && s.liveryName,
+    );
     if (liveryIndex >= 0) select.value = String(liveryIndex);
   }
 }
 function setTextureDictionary(doc, buffer, name) {
-  const liveryNames = nativeModel?.format === "yft"
-    ? nativeModel.drawables.flatMap(d => d.shaders.map(s => s.liveryName?.toLowerCase()).filter(Boolean)) : [];
-  const supported = doc.textures.find(t => t.supported && liveryNames.includes(t.name.toLowerCase()))
-    || doc.textures.find((t) => t.supported);
+  const liveryNames =
+    nativeModel?.format === "yft"
+      ? nativeModel.drawables.flatMap((d) =>
+          d.shaders.map((s) => s.liveryName?.toLowerCase()).filter(Boolean),
+        )
+      : [];
+  const supported =
+    doc.textures.find(
+      (t) => t.supported && liveryNames.includes(t.name.toLowerCase()),
+    ) || doc.textures.find((t) => t.supported);
   if (!supported)
     throw Error(
       "Nenhuma textura deste dicionário é suportada. BC7 e formatos desconhecidos ainda não estão disponíveis.",
@@ -945,7 +848,10 @@ function buildNativeModel(
       new THREE.BufferAttribute(data.positions, 3),
     );
     const shader = drawable.shaders[data.shaderIndex];
-    const paintUVs = doc.format === "yft" && shader?.liveryName && data.uvs1 ? data.uvs1 : data.uvs;
+    const paintUVs =
+      doc.format === "yft" && shader?.liveryName && data.uvs1
+        ? data.uvs1
+        : data.uvs;
     geometry.setAttribute("uv", new THREE.BufferAttribute(paintUVs, 2));
     geometry.setIndex(new THREE.BufferAttribute(data.indices, 1));
     if (data.normals)
@@ -962,14 +868,18 @@ function buildNativeModel(
     const mesh = new THREE.Mesh(geometry, mat);
     mesh.userData = {
       shaderIndex: data.shaderIndex,
-      diffuseName: (doc.format === "yft" ? shader?.liveryName : "") || shader?.diffuseName || "",
+      diffuseName:
+        (doc.format === "yft" ? shader?.liveryName : "") ||
+        shader?.diffuseName ||
+        "",
       liveryName: doc.format === "yft" ? shader?.liveryName || "" : "",
     };
     group.add(mesh);
   }
   installModel(group, name, true);
   nativeModel = doc;
-  $("#asset-type").textContent = `${doc.format === "yft" ? "YFT" : "YDD"} NATIVO · UV ATIVO`;
+  $("#asset-type").textContent =
+    `${doc.format === "yft" ? "YFT" : "YDD"} NATIVO · UV ATIVO`;
   nativeModelIndex = drawableIndex;
   nativeLodIndex = lodIndex;
   $("#native-model-controls").classList.remove("hidden");
@@ -986,7 +896,9 @@ function buildNativeModel(
   $("#mesh-info").textContent =
     `${drawable.name} · ${vertices.toLocaleString("pt-BR")} vértices · ${triangles.toLocaleString("pt-BR")} triângulos`;
   resetMaterialOptions();
-  const liveryIndex = drawable.shaders.findIndex(s => doc.format === "yft" && s.liveryName);
+  const liveryIndex = drawable.shaders.findIndex(
+    (s) => doc.format === "yft" && s.liveryName,
+  );
   if (liveryIndex >= 0) $("#material-select").value = String(liveryIndex);
   updateNativeMaterials();
 }
@@ -1078,8 +990,8 @@ function mipPixels(canvas, entry) {
   return levels;
 }
 $("#export-native").onclick = async () => {
-  if (!nativeTextures || decalSnapshot)
-    return toast("Aplique ou cancele o texto/imagem antes de exportar.");
+  if (!nativeTextures || editor?.pending())
+    return toast("Conclua ou cancele a criação atual antes de exportar.");
   const button = $("#export-native");
   button.disabled = true;
   button.textContent = "Preparando arquivo…";
@@ -1123,9 +1035,13 @@ $("#export-native").onclick = async () => {
       }
     }
     const data = writeYtd(nativeTextures, edits),
-      extension = nativeTextures.embedded ? nativeModel?.format || "ydd" : "ytd";
+      extension = nativeTextures.embedded
+        ? nativeModel?.format || "ydd"
+        : "ytd";
     download(
-      nativeTextureName.replace(/\.(yft|ydd|ytd)$/i, "") + "_editado." + extension,
+      nativeTextureName.replace(/\.(yft|ydd|ytd)$/i, "") +
+        "_editado." +
+        extension,
       new Blob([data], { type: "application/octet-stream" }),
     );
     toast(
@@ -1140,13 +1056,19 @@ $("#export-native").onclick = async () => {
       : "Exportar YTD editado";
   }
 };
-$("#save-project").onclick = () => {
-  if (decalSnapshot)
-    return toast("Aplique ou cancele o texto/imagem antes de salvar.");
+$("#save-project").onclick = async () => {
+  if (editor?.pending())
+    return toast("Conclua ou cancele a criação atual antes de salvar.");
   flushTexture();
   const project = {
     format: "paintfive",
-    version: 2,
+    version: 3,
+    fonts: editor.fonts,
+    layers: nativeTextures ? null : await editor.doc.serialize(),
+    view: {
+      camera: $("#camera-view").value,
+      lighting: $("#lighting-select").value,
+    },
     texture: textureCanvas.toDataURL("image/png"),
     base: base.toDataURL("image/png"),
     model: modelSource ? bufferToBase64(modelSource) : null,
@@ -1161,13 +1083,16 @@ $("#save-project").onclick = () => {
     nativeEmbedded: !!nativeTextures?.embedded,
     activeTexture: activeKey,
     bindings: [...materialBindings],
-    textureEdits: [...textureStates]
-      .filter(([, s]) => s.dirty)
-      .map(([key, s]) => ({
-        key,
-        texture: s.canvas.toDataURL("image/png"),
-        base: s.base.toDataURL("image/png"),
-      })),
+    textureEdits: await Promise.all(
+      [...textureStates]
+        .filter(([, s]) => s.dirty || s.document?.selection)
+        .map(async ([key, s]) => ({
+          key,
+          layers: s.document ? await s.document.serialize() : null,
+          texture: s.canvas.toDataURL("image/png"),
+          base: s.base.toDataURL("image/png"),
+        })),
+    ),
   };
   const projectFile = new Blob([JSON.stringify(project)], {
     type: "application/json",
@@ -1199,7 +1124,7 @@ async function projectImage(value) {
   return readImage(await (await fetch(value)).blob());
 }
 async function restoreProject(p) {
-  if (p.format !== "paintfive" || ![1, 2].includes(p.version))
+  if (p.format !== "paintfive" || ![1, 2, 3].includes(p.version))
     throw Error("Projeto inválido ou versão não suportada.");
   const [image, baseImage] = await Promise.all([
     projectImage(p.texture),
@@ -1210,7 +1135,8 @@ async function restoreProject(p) {
   const modelBuffer = p.model ? base64Buffer(p.model) : null,
     modelDoc =
       modelBuffer && ["ydd", "yft"].includes(p.modelFormat)
-        ? (p.modelFormat === "yft" ? parseYft : parseYdd)(modelBuffer) : null;
+        ? (p.modelFormat === "yft" ? parseYft : parseYdd)(modelBuffer)
+        : null;
   const textureBuffer = p.nativeTexture ? base64Buffer(p.nativeTexture) : null,
     textureDoc = textureBuffer
       ? p.nativeEmbedded
@@ -1227,6 +1153,18 @@ async function restoreProject(p) {
       : null;
   if (textureDoc && !textureDoc.resource)
     throw Error("Projeto com texturas embutidas sem YDD.");
+  if (p.fonts && (!Array.isArray(p.fonts) || p.fonts.length > 16))
+    throw Error("Lista de fontes inválida.");
+
+  const standaloneLayers = p.layers
+    ? await LayerDocument.restore(p.layers)
+    : null;
+  if (
+    standaloneLayers &&
+    (standaloneLayers.width !== image.width ||
+      standaloneLayers.height !== image.height)
+  )
+    throw Error("Resolução de camadas incompatível.");
   const restored = [];
   for (const edit of p.textureEdits || []) {
     const entry = textureDoc?.textures.find((t) => t.key === edit.key);
@@ -1242,8 +1180,26 @@ async function restoreProject(p) {
       b.height !== entry.height
     )
       throw Error("Dimensões editadas incompatíveis com o recurso.");
-    restored.push({ key: edit.key, a, b });
+    const document = edit.layers
+      ? await LayerDocument.restore(edit.layers)
+      : legacyDocument(a, b);
+    if (document.width !== entry.width || document.height !== entry.height)
+      throw Error("Resolução de camadas incompatível.");
+    restored.push({ key: edit.key, a, b, document });
   }
+  const fontFamilies = new Set((p.fonts || []).map((f) => f.family));
+  for (const doc of [
+    standaloneLayers,
+    ...restored.map((r) => r.document),
+  ].filter(Boolean))
+    for (const layer of doc.layers)
+      if (
+        layer.type === "text" &&
+        layer.font?.startsWith("GodoyFont_") &&
+        !fontFamilies.has(layer.font)
+      )
+        throw Error("Fonte personalizada ausente no projeto.");
+  await editor.restoreFonts(p.fonts || []);
   if (modelDoc)
     buildNativeModel(
       modelDoc,
@@ -1288,6 +1244,7 @@ async function restoreProject(p) {
       state.base.getContext("2d").clearRect(0, 0, item.b.width, item.b.height);
       state.base.getContext("2d").drawImage(item.b, 0, 0);
       state.map.needsUpdate = true;
+      state.document = item.document;
       state.dirty = true;
     }
     for (const [slot, key] of p.bindings || [])
@@ -1307,8 +1264,13 @@ async function restoreProject(p) {
     $("#texture-name").textContent = "Diffuse texture";
     updateNativeMaterials();
   }
-  history.length = future.length = 0;
   updateHistory();
+  if (!textureDoc)
+    editor.setDocument(standaloneLayers || legacyDocument(image, baseImage));
+  if (p.view) {
+    setCameraView(p.view.camera || "perspective");
+    setLighting(p.view.lighting || "studio");
+  }
   refresh();
   changed = false;
 }
@@ -1347,7 +1309,9 @@ $("#model-file").onchange = async (e) => {
     }
     const buffer = await file.arrayBuffer();
     if (/\.(ydd|yft)$/i.test(file.name)) {
-      const doc = /\.yft$/i.test(file.name) ? parseYft(buffer) : parseYdd(buffer);
+      const doc = /\.yft$/i.test(file.name)
+        ? parseYft(buffer)
+        : parseYdd(buffer);
       doc.drawables[0].readLod();
       if (nativeTextures?.embedded) {
         disposeTextureStates();
@@ -1390,31 +1354,205 @@ $("#model-file").onchange = async (e) => {
   }
 };
 window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    cancelDecal();
+    setTool("orbit");
+    return;
+  }
   if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
     e.preventDefault();
     $(e.shiftKey ? "#redo" : "#undo").click();
     return;
   }
-  if (e.key === "Escape") {
-    cancelDecal();
-    setTool("orbit");
+  if (e.key === "Enter" && tool === "pen") {
+    editor.finishPath(false);
+    return;
   }
-  const keyTool = { b: "brush", e: "erase", v: "orbit", d: "decal", t: "text", l: "line", i: "eyedropper" }[
-    e.key.toLowerCase()
-  ];
-  if (keyTool) setTool(keyTool);
+  if (
+    tool === "select" &&
+    editor.doc.active?.type !== "raster" &&
+    ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)
+  ) {
+    e.preventDefault();
+    const l = editor.doc.active,
+      step = e.shiftKey ? 10 : 1;
+    editor.doc.edit(
+      {
+        x: l.x + ({ ArrowLeft: -step, ArrowRight: step }[e.key] || 0),
+        y: l.y + ({ ArrowUp: -step, ArrowDown: step }[e.key] || 0),
+      },
+      "nudge",
+    );
+    return;
+  }
+  const next = {
+    b: "brush",
+    e: "erase",
+    v: "orbit",
+    d: "decal",
+    t: "text",
+    l: "line",
+    i: "eyedropper",
+    a: "select",
+    r: "rect",
+    c: "ellipse",
+    p: "pen",
+    f: "bucket",
+    u: "island",
+  }[e.key.toLowerCase()];
+  if (next) setTool(next);
 });
 window.addEventListener("beforeunload", (e) => {
-  if (changed || decalSnapshot || lineSnapshot) {
+  if (changed || editor?.pending()) {
     e.preventDefault();
     e.returnValue = "";
   }
 });
+function legacyDocument(image, original) {
+  const baseCanvas = document.createElement("canvas");
+  baseCanvas.width = image.width;
+  baseCanvas.height = image.height;
+  baseCanvas.getContext("2d").drawImage(original, 0, 0);
+  const doc = new LayerDocument(baseCanvas),
+    layerCanvas = document.createElement("canvas");
+  layerCanvas.width = image.width;
+  layerCanvas.height = image.height;
+  layerCanvas.getContext("2d").drawImage(image, 0, 0);
+  doc.add(
+    "raster",
+    { name: "Pintura importada (pixels)", canvas: layerCanvas },
+    false,
+  );
+  return doc;
+}
+editor = new AdvancedEditor({
+  textureCanvas,
+  ctx,
+  notify: toast,
+  setTool,
+  view,
+  isUV: () => showUV,
+  getImage: () => decal,
+  meshes: () => {
+    const meshes = [];
+    model.traverse((m) => {
+      if (m.isMesh && m.material.map === texture) meshes.push(m);
+    });
+    return meshes;
+  },
+  update: (dirty) => {
+    if (dirty) {
+      changed = true;
+      markTextureDirty();
+      $("#status").textContent = "Camadas locais · alterações não salvas";
+    }
+    refresh(false);
+  },
+});
+setTool("brush");
+const viewPanel = document.createElement("div");
+viewPanel.className = "section studio-controls";
+viewPanel.innerHTML = `<label class="section-title" for="camera-view">CÂMERAS / VISTAS</label><select id="camera-view" class="full"><option value="perspective">Perspectiva livre</option><option value="front">Frente · Ortográfica</option><option value="back">Trás · Ortográfica</option><option value="left">Esquerda · Ortográfica</option><option value="right">Direita · Ortográfica</option><option value="top">Topo / Teto · Ortográfica</option></select><div class="camera-buttons"><button data-view="front">Frente</button><button data-view="back">Trás</button><button data-view="left">Esquerda</button><button data-view="right">Direita</button><button data-view="top">Teto</button></div><label class="section-title" for="lighting-select">ILUMINAÇÃO 3D</label><select id="lighting-select" class="full"><option value="studio">Estúdio</option><option value="day">Dia</option><option value="night">Noite</option></select>`;
+$(".right").append(viewPanel);
+const quickViews = document.createElement("div");
+quickViews.className = "quick-studio";
+quickViews.append(viewPanel.querySelector(".camera-buttons"));
+quickViews.insertAdjacentHTML(
+  "beforeend",
+  `<select id="quick-lighting" aria-label="Iluminação rápida"><option value="studio">Estúdio</option><option value="day">Dia</option><option value="night">Noite</option></select>`,
+);
+$(".viewport").append(quickViews);
+function setCameraView(name) {
+  if (!["perspective", "front", "back", "left", "right", "top"].includes(name))
+    name = "perspective";
+  const rect = $(".viewport").getBoundingClientRect(),
+    aspect = rect.width / rect.height;
+  if (name === "perspective") {
+    camera = new THREE.PerspectiveCamera(36, aspect, 0.01, 100);
+    camera.position.set(
+      /\.yft$/i.test($("#asset-name").textContent) ? 2.8 : 0,
+      /\.yft$/i.test($("#asset-name").textContent) ? 1.25 : 0.3,
+      /\.yft$/i.test($("#asset-name").textContent) ? 3.1 : 5.8,
+    );
+  } else {
+    const half = Math.max(1.4, 1.4 / aspect);
+    camera = new THREE.OrthographicCamera(
+      -half * aspect,
+      half * aspect,
+      half,
+      -half,
+      0.01,
+      100,
+    );
+    camera.position.fromArray(
+      {
+        front: [0, 0, -4],
+        back: [0, 0, 4],
+        left: [-4, 0, 0],
+        right: [4, 0, 0],
+        top: [0, 4, 0],
+      }[name],
+    );
+    if (name === "top") camera.up.set(0, 0, -1);
+  }
+  controls.object = camera;
+  controls.target.set(0, 0, 0);
+  controls.update();
+  camera.updateProjectionMatrix();
+  $("#camera-view").value = name;
+  document
+    .querySelectorAll("[data-view]")
+    .forEach((b) => b.classList.toggle("active", b.dataset.view === name));
+  $("#view-name").textContent =
+    name === "perspective"
+      ? "PERSPECTIVA"
+      : $("#camera-view").selectedOptions[0].textContent.toUpperCase();
+}
+function setLighting(name) {
+  if (!["studio", "day", "night"].includes(name)) name = "studio";
+  const modes = {
+      studio: [2.2, 3.5, 2, 1.25, 0xfff3df],
+      day: [2.8, 4.4, 0.3, 1.1, 0xffffff],
+      night: [0.3, 0.5, 0.6, 0.85, 0x9dbbff],
+    },
+    m = modes[name];
+  ambient.intensity = m[0];
+  key.intensity = m[1];
+  rim.intensity = m[2];
+  renderer.toneMappingExposure = m[3];
+  key.color.setHex(m[4]);
+  $("#lighting-select").value = name;
+  $(".viewport").dataset.lighting = name;
+  $("#quick-lighting").value = name;
+}
+$("#camera-view").onchange = (e) => {
+  view(false);
+  setCameraView(e.target.value);
+};
+document.querySelectorAll("[data-view]").forEach(
+  (b) =>
+    (b.onclick = () => {
+      view(false);
+      setCameraView(b.dataset.view);
+    }),
+);
+$("#lighting-select").onchange = (e) => setLighting(e.target.value);
+$("#quick-lighting").onchange = (e) => setLighting(e.target.value);
+$("#reset-view").onclick = () => setCameraView("perspective");
+$("#back-view").onclick = () =>
+  setCameraView($("#camera-view").value === "front" ? "back" : "front");
 const resize = new ResizeObserver(() => {
   const rect = $(".viewport").getBoundingClientRect();
   renderer.setSize(rect.width, rect.height, false);
-  camera.aspect = rect.width / rect.height;
+  const aspect = rect.width / rect.height;
+  if (camera.isOrthographicCamera) {
+    const half = Math.max(1.4, 1.4 / aspect);
+    camera.left = -half * aspect;
+    camera.right = half * aspect;
+    camera.top = half;
+    camera.bottom = -half;
+  } else camera.aspect = aspect;
   camera.updateProjectionMatrix();
 });
 resize.observe($(".viewport"));

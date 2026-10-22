@@ -1,49 +1,72 @@
 # Godoy Paint Car
 
-Editor local de pinturas de viaturas GTA V Legacy/FiveM, com tema vermelho e preto e crédito “Developed By Gabriel Godoy” abaixo do logo. Baseado no [PAINTFIVE](https://github.com/gabrielgfernandes1998-oss/PAINTFIVE), revisão `5bc7e528fd6fcb1d56cc986125c241405fe884af`.
+Editor local de pinturas de viaturas GTA V Legacy/FiveM. Tema vermelho e preto, com “Developed By Gabriel Godoy” abaixo do logo. Baseado no [PAINTFIVE](https://github.com/gabrielgfernandes1998-oss/PAINTFIVE), revisão `5bc7e528fd6fcb1d56cc986125c241405fe884af`.
 
 ## Windows portable
 
-Baixe o ZIP em [Releases](https://github.com/gabrielgfernandes1998-oss/Godoy-Paint-Car/releases), extraia **todos os arquivos** e abra `GodoyPaintCar.exe`. Não precisa instalar Node.js. Requer Windows 10/11 x64 e WebGL. O pacote é gerado em Linux; o executável ainda precisa de validação em Windows.
+Baixe o ZIP em [Releases](https://github.com/gabrielgfernandes1998-oss/Godoy-Paint-Car/releases), extraia **todos os arquivos** e abra `GodoyPaintCar.exe`. Não precisa instalar Node.js. Requer Windows 10/11 x64 e WebGL. O pacote é gerado em Linux; a execução do EXE exige validação adicional em Windows.
 
-## Usar
+## Abrir uma viatura
 
-1. Em **Importar modelo**, abra o `.yft` ou `_hi.yft` da viatura.
-2. Em **Abrir dicionário YTD**, abra o `.ytd` correspondente. A pintura referenciada pelo modelo é selecionada automaticamente.
-3. Escolha uma textura em **Texturas do dicionário**. Variações da mesma pintura (por exemplo `virgilio_sign_1` e `virgilio_sign_2`) são vinculadas à carroceria automaticamente. Para outros nomes, selecione o material em **Aplicar na viatura** e clique em **Vincular textura selecionada**. A opção **Todas as superfícies** substitui os vínculos de todos os materiais: use apenas se desejado.
-4. Pinte com o botão esquerdo, orbite com o direito e aproxime com a roda. **B** pincel, **E** restaurar textura original, **V** navegação, **D** imagem; **Ctrl+Z** desfaz. Importe PNG/JPG para substituir a textura ou adicione uma imagem para posicionar uma arte no 3D. **Mapa UV** mostra a textura plana.
-5. **Exportar YTD editado** baixa uma cópia do dicionário. **Exportar textura** baixa PNG. **Salvar projeto** preserva modelos, texturas e vínculos em `.paintfive`, reaberto em **Importar modelo**. Não há salvamento automático.
+1. Em **Importar modelo**, abra o `.yft` ou `_hi.yft`.
+2. Abra o `.ytd` correspondente em **Abrir dicionário YTD**. A pintura referenciada pelo modelo é selecionada automaticamente.
+3. Escolha uma textura em **Texturas do dicionário**. Variações como `virgilio_sign_1` e `virgilio_sign_2` são associadas à carroceria. Para nomes diferentes, selecione o material em **Aplicar na viatura** e use **Vincular textura selecionada**. **Todas as superfícies** altera o vínculo de todos os materiais.
+4. Trabalhe no **Editor 3D** ou no **Mapa UV**. Botão direito orbita e roda aproxima. A barra de ferramentas pode ser rolada em janelas menores.
 
-Os arquivos originais não são sobrescritos. Para pintura externa no YTD, os YFT originais continuam em uso no FiveM; não é necessário exportar geometria.
+## Camadas e objetos editáveis
 
-## Texto, linha e conta-gotas
+Cada textura possui seu próprio documento e histórico:
 
-As ferramentas também funcionam no **Mapa UV**, sobre a textura plana:
+- **+ Pintura** cria uma camada transparente de pixels. Pincel **B** e borracha **E** atuam na camada de pintura ativa. Se um objeto ou a base estiver selecionado, o pincel cria uma camada de pixels. A borracha remove pixels da camada, revelando as camadas abaixo.
+- Selecione a camada na lista para mudar nome, visibilidade, ordem, opacidade, brilho, contraste e mesclagem **Normal / Multiply / Overlay / Screen**. Também é possível duplicar ou excluir. A base original é protegida contra exclusão e pintura direta.
+- **Texto (T)** e **Imagem (D)**: clique/arraste para posicionar a prévia e use **Aplicar**. Depois de aplicar, selecione a camada novamente para editar. O texto preserva conteúdo, fonte, tamanho, negrito, cor, opacidade, contorno e sombra.
+- **Selecionar / mover (A)**: arraste um texto, imagem ou forma no 3D ou UV para movê-lo. Também há campos de X/Y, largura, altura e rotação. Setas movem 1 pixel; Shift+seta move 10 pixels. O tamanho do texto é controlado pela fonte.
+- **Ctrl+Z / Ctrl+Shift+Z** desfaz/refaz alterações de camadas e desenho. Escape cancela a criação ou o arraste atual.
 
-- **Texto (T):** digite o conteúdo, escolha fonte, tamanho em pixels, negrito, cor e opacidade. Clique/arraste no 3D ou na textura para posicionar; ajuste a rotação e clique em **Aplicar texto**. **Cancelar** ou **Escape** removem a prévia. O texto aplicado vira pixels e pode ser desfeito; não é uma camada vetorial editável.
-- **Linha (L):** escolha cor, espessura e opacidade, arraste entre os dois pontos e solte para aplicar. **Escape** durante o arraste cancela a linha.
-- **Conta-gotas (I):** clique no modelo ou no mapa para copiar a cor do pixel da textura selecionada, sem a iluminação do 3D. Não altera pixels nem adiciona histórico.
-- **Ctrl+Z / Ctrl+Shift+Z:** desfazer/refazer texto, linhas e pintura. As ferramentas aplicadas são preservadas em projetos e na exportação YTD/PNG.
+### Fontes locais, contorno e sombra
 
-Linhas são retas no mapa UV; textos e imagens também seguem o UV do modelo. Costuras e ilhas UV podem separar ou distorcer a arte no 3D. Use o mapa plano para controlar a posição na textura.
+Na ferramenta de texto, **Carregar fonte .ttf / .otf** importa uma fonte do computador, sem serviço externo. A fonte fica incorporada ao projeto `.paintfive` para reabrir o texto com a mesma aparência. Há controles de contorno (espessura/cor) e sombra (cor, suavidade e deslocamentos X/Y).
 
-O botão **X** da janela fecha diretamente um projeto sem alterações. Com alterações ou uma prévia pendente, mostra **Continuar editando** e **Sair sem salvar**; salvar o projeto preserva a edição para depois.
+### Formas e caneta Bézier
 
-## Compatibilidade e limites
+- **Linha (L)**, **Retângulo (R)** e **Elipse (C)**: arraste entre os pontos para criar uma forma. Ajuste preenchimento, contorno, cor, dimensões e rotação depois. Para um círculo ou quadrado exato, defina largura e altura iguais.
+- **Caneta Bézier (P)**: clique para adicionar nós; arraste ao criar um nó para definir suas alças. **Enter / Concluir curva** termina uma curva aberta; **Fechar forma Bézier** fecha o caminho e permite preenchimento.
+- Para ajustar uma curva existente, selecione sua camada e clique em **Editar pontos da curva no UV**. Arraste nós ou alças visíveis no mapa.
 
-- YFT RSC7 versão 162 (Legacy): drawable principal e array de drawables, malhas indexadas e seleção de LODs presentes. `DiffuseSampler2` identifica a pintura; usa UV1 quando disponível, senão UV0.
-- YTD RSC7 versão 13: seleção de texturas, DXT1/3/5 e BGRA/RGBA com recompressão e regeneração de mipmaps. Outros formatos legíveis podem exigir exportação PNG.
-- YDD versão 165 e GLB/GLTF com recursos incorporados também são aceitos pela base.
-- Visualização estática simplificada: não reproduz todos os shaders, transparência de vidros, animação, deformação, física ou peças de dano destacadas. Não aplica transformações esqueléticas adicionais; outros veículos podem exigir suporte específico. Texturas compartilhadas ausentes no YTD aparecem com material neutro.
-- Enhanced/Gen9, BC7, RPF e arquivos criptografados/protegidos não são suportados.
-- Até 80 MB por arquivo, 256 MB por recurso descomprimido, 8192 pixels por lado e 16 megapixels por textura. Cache de texturas limitado a 32 megapixels; entradas não editadas e não exibidas podem ser descartadas do cache. Muitas edições grandes simultâneas exigem exportar e reabrir o YTD.
-- A compressão DXT tem perda. Confira a exportação no jogo antes de substituir arquivos de distribuição.
+### Preenchimento e seleção UV
 
-Os arquivos da Hilux fornecidos pelo usuário são amostras locais de validação e não integram o repositório ou o pacote distribuído.
+- **Preenchimento (F)** oferece **Área contígua da textura**, com tolerância de cor/alpha, e **Material clicado**, que preenche as regiões UV daquele material.
+- **Selecionar ilha UV (U)** escolhe a região conectada ao triângulo clicado. Pincel, preenchimento e novos objetos ficam restritos à máscara. A área é destacada no mapa UV.
+- **Limpar seleção / máscara** libera os próximos desenhos. Objetos criados com máscara mantêm essa restrição; **Remover máscara da camada** libera o objeto selecionado.
+- **Conta-gotas (I)** copia a cor original do pixel da textura selecionada, sem iluminação do 3D.
 
-## Desenvolvimento
+Superfícies que compartilham os mesmos pixels UV recebem a mesma pintura. Uma máscara não separa superfícies com UV sobreposto. Costuras e ilhas UV podem separar ou distorcer texto, linhas e imagens no 3D; use o mapa para posicionar a arte com precisão.
 
-Node.js 22+ e npm. Use o checkout existente; cada tarefa na nuvem já é isolada, sem necessidade de criar worktree.
+## Câmeras e iluminação
+
+Os botões acima do viewport alternam para vistas **ortográficas** de Frente, Trás, Esquerda, Direita e Teto. **Centralizar / Perspectiva livre** volta à câmera de perspectiva. A iluminação pode ser **Estúdio**, **Dia** ou **Noite**, inclusive pelo seletor rápido no viewport. São cenários de prévia estática; a conferência final da pintura deve ser feita no jogo.
+
+## Salvar e exportar
+
+- **Salvar projeto** baixa `.paintfive` versão 3, com camadas, objetos, fontes locais, vínculos de materiais, seleção UV e visualização. Reabra em **Importar modelo**. Não há salvamento automático.
+- Projetos das versões 1/2 continuam aceitos como camadas de pixels. Textos já achatados nessas versões não podem ser recuperados como objetos editáveis.
+- **Exportar YTD editado** grava uma cópia composta, preservando as demais texturas e o layout do recurso. **Exportar textura** baixa PNG. Esses formatos contêm o resultado final em pixels; mantenha o `.paintfive` para continuar editando camadas.
+- Os YFT originais continuam em uso no FiveM quando a pintura está em YTD separado. O editor não altera a geometria.
+- O botão X fecha diretamente um projeto sem alterações. Com alterações ou prévias pendentes, oferece **Continuar editando** / **Sair sem salvar**.
+
+## Compatibilidade e recursos
+
+- YFT RSC7 versão 162: drawable principal e array de drawables, malhas indexadas e seleção dos LODs presentes. `DiffuseSampler2` identifica a pintura; UV1 é usado quando disponível, senão UV0.
+- YTD versão 13: DXT1/3/5 e BGRA/RGBA com recompressão e regeneração de mipmaps. Outros formatos legíveis podem exigir exportação PNG.
+- YDD versão 165 e GLB/GLTF com recursos incorporados e UV também são aceitos.
+- Visualização estática simplificada: shaders GTA completos, transparência de vidros, animação, deformação, física e peças de dano destacadas não são reproduzidos. Transformações esqueléticas adicionais não são aplicadas. Outros modelos podem exigir suporte específico. Texturas compartilhadas ausentes aparecem com material neutro.
+- Enhanced/Gen9, BC7, RPF e recursos protegidos/criptografados não são suportados.
+- Até 80 MB por arquivo/projeto, 256 MB por recurso descomprimido, 8192 pixels por lado e 16 megapixels por textura. Cache de texturas de 32 megapixels; até 48 camadas por textura, 32 megapixels em camadas de pintura e 64 megapixels em bitmaps/máscaras de um documento. Histórico de até 12 ações, também limitado pela memória. Até 16 fontes locais de 10 MB cada. Projetos grandes podem exigir trabalhar em texturas separadas.
+- DXT é uma compressão com perda. Confira o resultado no jogo antes de substituir os arquivos de distribuição.
+
+## Desenvolvimento e validação
+
+Node.js 22+ e npm. Use o checkout existente: cada tarefa na nuvem já é isolada, sem necessidade de worktree.
 
 ```sh
 npm ci --cache /tmp/godoy-npm
@@ -51,29 +74,17 @@ npm run dev -- --port 5173
 npm test
 npm run build
 CHROMIUM_PATH=/usr/bin/chromium npm run test:browser
-# Teste de fechamento em Electron Linux (executável oficial já instalado):
+# Fechamento em Electron Linux, com um executável oficial já instalado:
 ELECTRON_PATH=/caminho/electron npm run test:electron
-```
-
-Sem banco de dados, credenciais ou serviços externos obrigatórios. As fontes externas são opcionais.
-
-Para validar arquivos reais, forneça a pasta com seus YFT/YDD/YTD:
-
-```sh
-npm run test:assets -- /pasta/com/arquivos
-# Integração no navegador com um YFT e YTD reais; requer build:
+# Arquivos reais, externos ao repositório:
+npm run test:assets -- /pasta/com/yft-ytd
 CHROMIUM_PATH=/usr/bin/chromium node tests/vehicle.e2e.mjs /pasta/viatura.yft /pasta/viatura.ytd
+# Portable Windows:
+NODE_USE_ENV_PROXY=1 npm run package:windows
 ```
 
-Os testes de navegador iniciam e encerram um preview local. Para gerar um pacote Windows, execute `npm run package:windows`. A configuração usa Electron e verifica o checksum do download oficial. Um pacote gerado em Linux exige validação adicional no Windows. Não há publicação automática durante o desenvolvimento; o workflow de release roda ao enviar uma tag `v*`.
+A suíte avançada usa uma fonte TTF/OTF local para provar incorporação e restauração. Ela procura DejaVu/Liberation no Linux; use `TEST_FONT_PATH=/caminho/fonte.ttf` para outra fonte. Não distribui as fontes usadas no teste. Não há banco de dados, credenciais ou serviços externos obrigatórios; fontes externas da interface são opcionais.
 
-A implementação e os codecs JavaScript vêm da base PAINTFIVE do mesmo proprietário. Os offsets de YFT foram consultados nas definições públicas de [CodeWalker](https://github.com/dexyfex/CodeWalker/blob/master/CodeWalker.Core/GameFiles/Resources/Frag.cs). Avisos de terceiros estão em `THIRD_PARTY_NOTICES.txt`.
+Validações: formatos/codecs, conectividade de ilhas UV e limites de costuras; importação, pintura e exportação YTD; composição de mesclagens, ajustes por camada, preenchimento contíguo/material, máscara UV, movimento e reedição de texto, contorno/sombra, fontes locais, imagens, elipses e curvas Bézier; restauração do projeto, câmeras e iluminação. O fechamento foi testado em Electron real/Linux com as escolhas do diálogo simuladas. O EXE exige validação adicional em Windows.
 
-## Validação desta implementação
-
-- 10 testes unitários de formatos e codecs.
-- Build de produção, testes funcionais da base e testes de texto/linha/conta-gotas em 3D e UV, histórico, projeto e exportação YTD.
-- Fechamento testado com Electron real em Linux: janela limpa, cancelamento e saída com alterações. O teste simula a escolha dos botões da caixa nativa.
-- Hilux fornecida: leitura de `vrhiluxsp.yft` e `vrhiluxsp_hi.yft`, cada um com 112 malhas, 339.019 vértices e 346.707 triângulos; decodificação das 73 texturas do YTD e preservação dos bytes descomprimidos ao exportar sem edições.
-- Teste de navegador com `vrhiluxsp.yft` e seu YTD: pintura no 3D, exportação/releitura com somente a textura editada alterada, preservação das outras 72 texturas, salvamento/reabertura do projeto YFT e troca de variação da pintura.
-- Testes funcionais executados em Chromium/Linux. A execução no jogo e do portable em Windows requer validação nessas plataformas.
+Os arquivos da Hilux fornecidos pelo usuário são usados somente na validação local, fora do repositório e do portable. O parser/codecs vêm da base PAINTFIVE; offsets de YFT foram consultados nas definições públicas de [CodeWalker](https://github.com/dexyfex/CodeWalker/blob/master/CodeWalker.Core/GameFiles/Resources/Frag.cs). Avisos estão em `THIRD_PARTY_NOTICES.txt`.
